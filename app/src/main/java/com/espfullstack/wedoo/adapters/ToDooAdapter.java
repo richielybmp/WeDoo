@@ -11,15 +11,15 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.espfullstack.wedoo.R;
-import com.espfullstack.wedoo.pojo.ToDo;
+import com.espfullstack.wedoo.pojo.ToDoo;
 
 import java.util.List;
 
-public class ToDoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private List<ToDo> toDoList;
+public class ToDooAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    private List<ToDoo> toDooList;
 
-    public ToDoAdapter(List<ToDo> toDoList) {
-        this.toDoList = toDoList;
+    public ToDooAdapter(List<ToDoo> toDooList) {
+        this.toDooList = toDooList;
     }
 
     @NonNull
@@ -28,8 +28,8 @@ public class ToDoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         final View view;
         switch (viewType) {
-            case ToDo.TAREFA:
-            case ToDo.COMPRA:
+            case ToDoo.TAREFA:
+            case ToDoo.COMPRA:
             default:
                 view = inflater.inflate(R.layout.todo_item, parent, false);
                 return new ToDoViewHolder(view);
@@ -38,26 +38,26 @@ public class ToDoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        final ToDo toDo = toDoList.get(position);
+        final ToDoo toDoo = toDooList.get(position);
         int viewType = holder.getItemViewType();
         switch (viewType) {
-            case ToDo.TAREFA:
-            case ToDo.COMPRA:
+            case ToDoo.TAREFA:
+            case ToDoo.COMPRA:
             default:
-                ((ToDoViewHolder) holder).bind(toDo);
+                ((ToDoViewHolder) holder).bind(toDoo);
         }
     }
 
     @Override
     public int getItemViewType(int position) {
-        //Se quiser diferenciar as views para cada tipo de ToDo
-        ToDo todo = toDoList.get(position);
+        //Se quiser diferenciar as views para cada tipo de ToDoo
+        ToDoo todo = toDooList.get(position);
         return todo.getType();
     }
 
     @Override
     public int getItemCount() {
-        return toDoList.size();
+        return toDooList.size();
     }
 
     class ToDoViewHolder extends RecyclerView.ViewHolder {
@@ -69,8 +69,8 @@ public class ToDoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             ButterKnife.bind(this, itemView);
         }
 
-        void bind(ToDo toDo) {
-            tvTitle.setText(toDo.getTitle());
+        void bind(ToDoo toDoo) {
+            tvTitle.setText(toDoo.getTitle());
         }
     }
 }

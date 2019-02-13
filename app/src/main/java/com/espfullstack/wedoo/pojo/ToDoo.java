@@ -1,7 +1,7 @@
 package com.espfullstack.wedoo.pojo;
 
-public class ToDo {
-    public static final String TABLE = "todos";
+public class ToDoo {
+    public static final String TABLE = "todoos";
     public static final String ID = "id";
     public static final String TITLE = "title";
     public static final String DESCRIPTION = "description";
@@ -13,19 +13,28 @@ public class ToDo {
     //+++++
 
 
+    private int id;
     private String title;
     private String description;
     private int type;
     private String endDate;
 
-    public ToDo() {
+    public ToDoo() {
     }
 
-    public ToDo(String title, String description, int type, String endDate) {
+    public ToDoo(String title, String description, int type, String endDate) {
         this.title = title;
         this.description = description;
         this.type = type;
         this.endDate = endDate;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getTitle() {
