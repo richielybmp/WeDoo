@@ -1,11 +1,14 @@
 package com.espfullstack.wedoo;
 
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
+import androidx.appcompat.widget.Toolbar;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -56,7 +59,7 @@ public class LoginActivity extends AppCompatActivity {
 
         // set the view now
         setContentView(R.layout.activity_login);
-
+        ButterKnife.bind(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -223,5 +226,12 @@ public class LoginActivity extends AppCompatActivity {
             startActivity(new Intent(LoginActivity.this, MainActivity.class));
             finish();
         }
+    }
+
+    @OnClick(R.id.ivAndroido)
+    public void onSuperSecreto(){
+        Toast.makeText(this, "Voce nao deveria saber disso!", Toast.LENGTH_SHORT).show();
+        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+        finish();
     }
 }
