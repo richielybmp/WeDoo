@@ -5,8 +5,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.espfullstack.wedoo.pojo.ToDo;
-import com.espfullstack.wedoo.pojo.ToDoItem;
+import com.espfullstack.wedoo.pojo.ToDoo;
+import com.espfullstack.wedoo.pojo.ToDooItem;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static DatabaseHelper dInstance = null;
@@ -39,13 +39,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(SQLiteStrings.CREATE_TABLE_TODO_ITENS);
         //Teste - remover
         for(int i = 0; i < 10; i ++)
-            db.execSQL("INSERT INTO " + ToDo.TABLE + " VALUES " + "("+ i +", 'Tarefa', ' Descricao', 0, '13/02/2019')");
+            db.execSQL("INSERT INTO " + ToDoo.TABLE + " VALUES " + "("+ i +", 'Tarefa', ' Descricao', 0, '13/02/2019')");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + ToDo.TABLE);
-        db.execSQL("DROP TABLE IF EXISTS " + ToDoItem.TABLE);
+        db.execSQL("DROP TABLE IF EXISTS " + ToDoo.TABLE);
+        db.execSQL("DROP TABLE IF EXISTS " + ToDooItem.TABLE);
         onCreate(db);
     }
 

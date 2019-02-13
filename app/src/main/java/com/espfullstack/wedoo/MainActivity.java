@@ -1,12 +1,11 @@
 package com.espfullstack.wedoo;
 
+import android.content.Intent;
 import android.os.Bundle;
 
-import com.espfullstack.wedoo.adapters.ToDoAdapter;
-import com.espfullstack.wedoo.controllers.ToDoController;
-import com.espfullstack.wedoo.pojo.ToDo;
+import com.espfullstack.wedoo.adapters.ToDooAdapter;
+import com.espfullstack.wedoo.controllers.ToDooController;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,8 +27,8 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.fab)
     FloatingActionButton fab;
 
-    ToDoController toDoController;
-    ToDoAdapter toDoAdapter;
+    ToDooController toDooController;
+    ToDooAdapter toDooAdapter;
 
 
     RecyclerView.OnScrollListener onScrollListener = new RecyclerView.OnScrollListener() {
@@ -53,10 +52,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
-        toDoController = new ToDoController(this);
-        toDoAdapter = new ToDoAdapter(toDoController.getAll());
+        toDooController = new ToDooController(this);
+        toDooAdapter = new ToDooAdapter(toDooController.getAll());
 
-        rvToDo.setAdapter(toDoAdapter);
+        rvToDo.setAdapter(toDooAdapter);
         rvToDo.setLayoutManager(new LinearLayoutManager(this));
         rvToDo.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 
@@ -67,7 +66,10 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.fab)
     public void onFabClick(View view) {
-        Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show();
+        startToDoActivity(new Intent(MainActivity.this, ToDoActivity.class));
+    }
+
+    private void startToDoActivity(Intent intent) {
+        startActivity(intent);
     }
 }

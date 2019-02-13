@@ -1,27 +1,27 @@
 package com.espfullstack.wedoo.helper;
 
-import com.espfullstack.wedoo.pojo.ToDo;
-import com.espfullstack.wedoo.pojo.ToDoItem;
+import com.espfullstack.wedoo.pojo.ToDoo;
+import com.espfullstack.wedoo.pojo.ToDooItem;
 
 public class SQLiteStrings {
     static final String CREATE_TABLE_TODO =
-            "CREATE TABLE " + ToDo.TABLE
+            "CREATE TABLE " + ToDoo.TABLE
             + "("
-            + ToDo.ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-            + ToDo.TITLE + " TEXT,"
-            + ToDo.DESCRIPTION + " TEXT,"
-            + ToDo.TYPE + " INTEGER,"
-            + ToDo.END_DATE + " TEXT"
+            + ToDoo.ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + ToDoo.TITLE + " TEXT,"
+            + ToDoo.DESCRIPTION + " TEXT,"
+            + ToDoo.TYPE + " INTEGER,"
+            + ToDoo.END_DATE + " TEXT"
             + ")";
 
     static final String CREATE_TABLE_TODO_ITENS =
-            "CREATE TABLE " + ToDoItem.TABLE
+            "CREATE TABLE " + ToDooItem.TABLE
             + "("
-            + ToDoItem.ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-            + ToDoItem.TITLE + " TEXT,"
-            + ToDoItem.DESCRIPTION + " TEXT,"
-            + ToDoItem.FK + " INTEGER,"
-            + "FOREIGN KEY(" + ToDoItem.FK + ") REFERENCES " + ToDo.TABLE + "(" + ToDo.ID + ") ON DELETE CASCADE"
+            + ToDooItem.ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + ToDooItem.TITLE + " TEXT,"
+            + ToDooItem.DESCRIPTION + " TEXT,"
+            + ToDooItem.FK + " INTEGER,"
+            + "FOREIGN KEY(" + ToDooItem.FK + ") REFERENCES " + ToDoo.TABLE + "(" + ToDoo.ID + ") ON DELETE CASCADE"
             + ")";
 
 }
