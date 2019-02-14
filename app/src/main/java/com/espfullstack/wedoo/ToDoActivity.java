@@ -5,7 +5,11 @@ import androidx.appcompat.widget.Toolbar;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Toast;
+
+import com.espfullstack.wedoo.pojo.ToDoo;
 
 public class ToDoActivity extends AppCompatActivity {
 
@@ -21,6 +25,13 @@ public class ToDoActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(R.string.app_name);
+
+
+        Intent i = getIntent();
+        ToDoo toDoo =  (ToDoo) i.getSerializableExtra("todoos");
+
+        Toast.makeText(this, "Titulo"+toDoo.getTitle(), Toast.LENGTH_SHORT).show();
+
     }
 
     @Override

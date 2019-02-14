@@ -1,6 +1,8 @@
 package com.espfullstack.wedoo.pojo;
 
-public class ToDoo {
+import java.io.Serializable;
+
+public class ToDoo implements Serializable {
     public static final String TABLE = "todoos";
     public static final String ID = "id";
     public static final String TITLE = "title";

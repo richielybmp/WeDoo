@@ -5,12 +5,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.espfullstack.wedoo.R;
+import com.espfullstack.wedoo.ToDoActivity;
 import com.espfullstack.wedoo.pojo.ToDoo;
 
 import java.util.List;
@@ -60,17 +63,30 @@ public class ToDooAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         return toDooList.size();
     }
 
-    class ToDoViewHolder extends RecyclerView.ViewHolder {
+    class ToDoViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         @BindView(R.id.tvToDoTitle)
         TextView tvTitle;
 
+        View todoView;
+
         ToDoViewHolder(@NonNull View itemView) {
             super(itemView);
+            todoView = itemView;
+            todoView.setOnClickListener(this);
             ButterKnife.bind(this, itemView);
         }
 
         void bind(ToDoo toDoo) {
             tvTitle.setText(toDoo.getTitle());
+        }
+
+        @Override
+        public void onClick(View v) {
+            Context context = v.getContext();
+
+            Intent intent = new Intent(context, ToDoActivity.class);
+            intent.putExtra("todoos", toDooList.get(getAdapterPosition()));
+            context.startActivity(intent);
         }
     }
 }
