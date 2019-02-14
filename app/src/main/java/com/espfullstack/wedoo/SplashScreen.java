@@ -18,6 +18,7 @@ public class SplashScreen extends AppCompatActivity {
             @Override
             public void run() {
                 Intent splashIntent = new Intent(SplashScreen.this, LoginActivity.class);
+                splashIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(splashIntent);
                 finish();
             }

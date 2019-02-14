@@ -26,38 +26,33 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:theme="@style/Login.EditTextAppearance"
+            >
 
             <EditText
                 android:id="@+id/email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/email"
-                android:inputType="textEmailAddress"
-                android:maxLines="1"
-                android:shadowColor="@color/colorAccent"
-                android:singleLine="true"
-                android:textColor="@color/btn_login"
-                android:textColorHighlight="@color/white"/>
+                android:inputType="textEmailAddress" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            app:passwordToggleEnabled="true"
+            android:theme="@style/Login.EditTextAppearance"
+            >
 
             <EditText
                 android:id="@+id/password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:focusableInTouchMode="true"
                 android:hint="@string/hint_password"
-                android:imeOptions="actionUnspecified"
                 android:inputType="textPassword"
-                android:maxLines="1"
-                android:singleLine="true"
-                android:textColor="@color/btn_login"
-            />
+             />
         </com.google.android.material.textfield.TextInputLayout>
 
         <Button
@@ -66,15 +61,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:background="@color/colorAccent"
+            android:background="@color/colorAccent_login"
             android:text="@string/btn_login"
-            android:textColor="@android:color/white"
+            android:textColor="@color/input_login"
             android:textStyle="bold" />
 
 
         <com.google.android.gms.common.SignInButton
             android:id="@+id/google_signin"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="16dp"
@@ -106,9 +101,9 @@
 
     <ProgressBar
         android:id="@+id/progressBar"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_gravity="center|bottom"
-        android:layout_marginBottom="20dp"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
         android:visibility="gone" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
