@@ -126,7 +126,7 @@ public class ToDooController {
     }
 
     public boolean saveToDoo(ToDoo toDoo) {
-        if(toDoo.getId() > 0) {
+        if(toDoo.getId() > -1) {
             return updateToDoo(toDoo);
         } else {
             return addToDoo(toDoo);

@@ -1,28 +1,36 @@
 package com.espfullstack.wedoo.adapters;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import android.content.Context;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.espfullstack.wedoo.R;
-import com.espfullstack.wedoo.ToDooActivity;
+import com.espfullstack.wedoo.events.ToDooItemClickedEvent;
+import com.espfullstack.wedoo.helper.ColorUtil;
 import com.espfullstack.wedoo.pojo.ToDoo;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.List;
+import java.util.Random;
 
 public class ToDooAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<ToDoo> toDooList;
 
+    Random random = new Random();
+
+    private float h;
+
     public ToDooAdapter(List<ToDoo> toDooList) {
         this.toDooList = toDooList;
+        h = random.nextFloat();
     }
 
     @NonNull
@@ -63,9 +71,21 @@ public class ToDooAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         return toDooList.size();
     }
 
+    public void addToDoo(ToDoo todoo) {
+        toDooList.add(todoo);
+        notifyItemInserted(toDooList.size() - 1);
+    }
+
+    public void updateToDoo(ToDoo toDoo, int position) {
+        toDooList.set(position, toDoo);
+        notifyItemChanged(position);
+    }
+
     class ToDoViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         @BindView(R.id.tvToDoTitle)
         TextView tvTitle;
+        @BindView(R.id.cvToDoo)
+        CardView cvToDoo;
 
         View todoView;
 
@@ -77,16 +97,17 @@ public class ToDooAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
 
         void bind(ToDoo toDoo) {
+            h += ColorUtil.GOLDEN_RATIO;
+            int color = ColorUtil.generateColor(h);
+            cvToDoo.setBackgroundColor(color);
             tvTitle.setText(toDoo.getTitle());
         }
 
         @Override
         public void onClick(View v) {
-            Context context = v.getContext();
-
-            Intent intent = new Intent(context, ToDooActivity.class);
-            intent.putExtra("todoo", toDooList.get(getAdapterPosition()));
-            context.startActivity(intent);
+            int position = getAdapterPosition();
+            ToDoo toDoo = toDooList.get(position);
+            EventBus.getDefault().post(new ToDooItemClickedEvent(toDoo, position));
         }
     }
 }

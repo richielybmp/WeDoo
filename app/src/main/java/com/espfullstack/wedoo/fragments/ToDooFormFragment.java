@@ -9,6 +9,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import android.os.Debug;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -71,7 +72,7 @@ public class ToDooFormFragment extends Fragment {
     }
 
     @OnClick(R.id.btnSalvar)
-    public void onSalvarClick() {
+    public void onSalvarClick(View View) {
         if(saveToDoo())
             EventBus.getDefault().post(new ToDooSavedEvent(toDoo));
     }
@@ -79,6 +80,7 @@ public class ToDooFormFragment extends Fragment {
     private boolean saveToDoo() {
         if(toDoo == null) {
             toDoo = new ToDoo();
+            toDoo.setId(-1);
         }
         String description = edtDescricao.getText().toString();
         String titulo = edtTitulo.getText().toString();
