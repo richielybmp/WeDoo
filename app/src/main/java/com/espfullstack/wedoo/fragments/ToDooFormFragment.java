@@ -12,7 +12,6 @@ import butterknife.OnClick;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 
 import com.espfullstack.wedoo.R;
@@ -81,11 +80,11 @@ public class ToDooFormFragment extends Fragment {
         if(toDoo == null) {
             toDoo = new ToDoo();
         }
-        String description = edtTitulo.getText().toString();
-        String titulo = edtDescricao.getText().toString();
+        String description = edtDescricao.getText().toString();
+        String titulo = edtTitulo.getText().toString();
         toDoo.setDescription(description);
         toDoo.setTitle(titulo);
-        return toDooController.addToDo(toDoo);
+        return toDooController.saveToDoo(toDoo);
     }
 
 }

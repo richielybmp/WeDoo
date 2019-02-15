@@ -18,7 +18,7 @@ public class ToDooController {
         databaseHelper = DatabaseHelper.getInstance(context);
     }
 
-    public boolean addToDo(ToDoo toDoo) {
+    public boolean addToDoo(ToDoo toDoo) {
         ContentValues values = new ContentValues();
         SQLiteDatabase database = databaseHelper.getDatabase();
         database.beginTransaction();
@@ -30,7 +30,33 @@ public class ToDooController {
             values.put(ToDoo.END_DATE, toDoo.getEndDate());
 
             resultado = database.insertWithOnConflict(ToDoo.TABLE, null,
-                    values, SQLiteDatabase.CONFLICT_ROLLBACK);
+                    values, SQLiteDatabase.CONFLICT_REPLACE);
+            database.setTransactionSuccessful();
+        } finally {
+            database.endTransaction();
+        }
+
+        if(resultado > 0) {
+            toDoo.setId((int) resultado);
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean updateToDoo(ToDoo toDoo) {
+        ContentValues values = new ContentValues();
+        SQLiteDatabase database = databaseHelper.getDatabase();
+        database.beginTransaction();
+        long resultado = 0;
+        try {
+            values.put(ToDoo.TITLE, toDoo.getTitle());
+            values.put(ToDoo.DESCRIPTION, toDoo.getDescription());
+            values.put(ToDoo.TYPE, toDoo.getType());
+            values.put(ToDoo.END_DATE, toDoo.getEndDate());
+
+            resultado = database.update(ToDoo.TABLE,
+                    values, ToDoo.ID + " = ?", new String[] {String.valueOf(toDoo.getId())});
             database.setTransactionSuccessful();
         } finally {
             database.endTransaction();
@@ -51,13 +77,14 @@ public class ToDooController {
         try {
             for (ToDoo toDoo : toDooList) {
                 values = new ContentValues();
+                values.put(ToDoo.ID, toDoo.getId());
                 values.put(ToDoo.TITLE, toDoo.getTitle());
                 values.put(ToDoo.DESCRIPTION, toDoo.getDescription());
                 values.put(ToDoo.TYPE, toDoo.getType());
                 values.put(ToDoo.END_DATE, toDoo.getEndDate());
 
                 database.insertWithOnConflict(ToDoo.TABLE, null,
-                        values, SQLiteDatabase.CONFLICT_ROLLBACK);
+                        values, SQLiteDatabase.CONFLICT_REPLACE);
             }
             database.setTransactionSuccessful();
         } finally {
@@ -96,5 +123,13 @@ public class ToDooController {
             database.endTransaction();
         }
         return result;
+    }
+
+    public boolean saveToDoo(ToDoo toDoo) {
+        if(toDoo.getId() > 0) {
+            return updateToDoo(toDoo);
+        } else {
+            return addToDoo(toDoo);
+        }
     }
 }
