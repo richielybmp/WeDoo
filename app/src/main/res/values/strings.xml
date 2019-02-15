@@ -30,5 +30,15 @@
     <string name="lbl_forgot_password">Forgot password?</string>
     <string name="forgot_password_msg">We just need your registered Email Id to sent you password reset instructions.</string>
     <string name="title_activity_main">MainActivity</string>
+
+    <!-- Strings frame -->
+    <string name="create_new_task">Criar nova tarefa</string>
+    <string name="todoo_title">Título</string>
+    <string name="todoo_description">Descrição</string>
+    <string name="todoo_type">Tipo</string>
+    <string name="todoo_end_date">Encerramento</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
 

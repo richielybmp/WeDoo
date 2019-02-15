@@ -70,7 +70,10 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.fab)
     public void onFabClick(View view) {
-        startToDoActivity(new Intent(MainActivity.this, ToDoActivity.class));
+//        startToDoActivity(new Intent(MainActivity.this, ToDoActivity.class));
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.frame_main, )
     }
 
     private void startToDoActivity(Intent intent) {
