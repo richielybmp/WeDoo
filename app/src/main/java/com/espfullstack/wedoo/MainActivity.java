@@ -9,6 +9,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -28,52 +29,38 @@ public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
+
     @BindView(R.id.rvToDo)
+    @Nullable
     RecyclerView rvToDo;
+
     @BindView(R.id.fab)
     FloatingActionButton fab;
 
-    ToDooController toDooController;
-    ToDooAdapter toDooAdapter;
-
-    RecyclerView.OnScrollListener onScrollListener = new RecyclerView.OnScrollListener() {
-        @Override
-        public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-            switch (newState) {
-                case RecyclerView.SCROLL_STATE_IDLE:
-                    fab.show();
-                    break;
-                default:
-                    fab.hide();
-                    break;
-            }
-            super.onScrollStateChanged(recyclerView, newState);
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
         setSupportActionBar(toolbar);
-        toDooController = new ToDooController(this);
-        toDooAdapter = new ToDooAdapter(toDooController.getAll());
+        getSupportActionBar().setTitle(R.string.app_name);
 
-        rvToDo.setAdapter(toDooAdapter);
-        rvToDo.setLayoutManager(new LinearLayoutManager(this));
-        rvToDo.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
-
-        rvToDo.addOnScrollListener(onScrollListener);
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.frame_main, new MainFragment(fab))
+                .commit();
 
     }
 
     @OnClick(R.id.fab)
     public void onFabClick(View view) {
-//        startToDoActivity(new Intent(MainActivity.this, ToDoActivity.class));
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(R.id.frame_main, )
+                .replace(R.id.frame_main, new ToDooFormFragment())
+                .commit();
     }
 
     private void startToDoActivity(Intent intent) {
