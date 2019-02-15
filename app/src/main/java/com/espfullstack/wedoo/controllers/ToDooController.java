@@ -18,22 +18,30 @@ public class ToDooController {
         databaseHelper = DatabaseHelper.getInstance(context);
     }
 
-    public void addToDo(ToDoo toDoo) {
+    public boolean addToDo(ToDoo toDoo) {
         ContentValues values = new ContentValues();
         SQLiteDatabase database = databaseHelper.getDatabase();
         database.beginTransaction();
+        long resultado = 0;
         try {
             values.put(ToDoo.TITLE, toDoo.getTitle());
             values.put(ToDoo.DESCRIPTION, toDoo.getDescription());
             values.put(ToDoo.TYPE, toDoo.getType());
             values.put(ToDoo.END_DATE, toDoo.getEndDate());
 
-            database.insertWithOnConflict(ToDoo.TABLE, null,
+            resultado = database.insertWithOnConflict(ToDoo.TABLE, null,
                     values, SQLiteDatabase.CONFLICT_ROLLBACK);
             database.setTransactionSuccessful();
         } finally {
             database.endTransaction();
         }
+
+        if(resultado > 0) {
+            toDoo.setId((int) resultado);
+            return true;
+        }
+
+        return false;
     }
 
     public void addAll(List<ToDoo> toDooList) {

@@ -13,7 +13,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.espfullstack.wedoo.R;
-import com.espfullstack.wedoo.ToDoActivity;
+import com.espfullstack.wedoo.ToDooActivity;
 import com.espfullstack.wedoo.pojo.ToDoo;
 
 import java.util.List;
@@ -84,8 +84,8 @@ public class ToDooAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         public void onClick(View v) {
             Context context = v.getContext();
 
-            Intent intent = new Intent(context, ToDoActivity.class);
-            intent.putExtra("todoos", toDooList.get(getAdapterPosition()));
+            Intent intent = new Intent(context, ToDooActivity.class);
+            intent.putExtra("todoo", toDooList.get(getAdapterPosition()));
             context.startActivity(intent);
         }
     }

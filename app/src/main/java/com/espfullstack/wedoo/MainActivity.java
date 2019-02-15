@@ -3,17 +3,13 @@ package com.espfullstack.wedoo;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.espfullstack.wedoo.adapters.ToDooAdapter;
-import com.espfullstack.wedoo.controllers.ToDooController;
+import com.espfullstack.wedoo.fragments.ToDooFormFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -56,15 +52,12 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.fab)
     public void onFabClick(View view) {
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.frame_main, new ToDooFormFragment())
-                .commit();
-    }
-
-    private void startToDoActivity(Intent intent) {
+        Intent intent = new Intent(this, ToDooActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("todoo", null);
+        intent.putExtras(bundle);
         startActivity(intent);
+
     }
 
     @Override
@@ -79,8 +72,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId())
-        {
+        switch (item.getItemId()) {
             case R.id.btn_logout:
                 FirebaseAuth.getInstance().signOut();
                 Intent signInIntent = new Intent(this.getApplicationContext(), LoginActivity.class);

@@ -27,9 +27,6 @@ public class ToDoActivity extends AppCompatActivity {
     @BindView(R.id.rvToDooItem)
     RecyclerView rvToDooItem;
 
-    @BindView(R.id.fab_todo)
-    FloatingActionButton fab_todo;
-
     ToDooItemController toDooItemController;
     ToDooItemAdapter toDooItemAdapter;
 
@@ -63,12 +60,4 @@ public class ToDoActivity extends AppCompatActivity {
         onBackPressed();
         return true;
     }
-
-
-    @OnClick(R.id.fab_todo)
-    public void onFabClick(View view) {
-        Toast.makeText(this, "FAB Clicked", Toast.LENGTH_SHORT).show();
-    }
-    
-    
 }
