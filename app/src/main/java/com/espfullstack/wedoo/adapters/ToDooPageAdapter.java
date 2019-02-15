@@ -5,6 +5,7 @@ import android.content.Context;
 import com.espfullstack.wedoo.R;
 import com.espfullstack.wedoo.fragments.ToDooFormFragment;
 import com.espfullstack.wedoo.fragments.ToDooItemFragment;
+import com.espfullstack.wedoo.pojo.ToDoo;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -12,12 +13,14 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
-public class FPageAdapter extends FragmentPagerAdapter {
+public class ToDooPageAdapter extends FragmentPagerAdapter {
     private Context context;
+    private ToDoo toDoo;
 
-    public FPageAdapter(@NonNull FragmentManager fm, Context context) {
+    public ToDooPageAdapter(@NonNull FragmentManager fm, Context context, ToDoo toDoo) {
         super(fm);
         this.context = context;
+        this.toDoo = toDoo;
     }
 
     @NonNull
@@ -25,9 +28,9 @@ public class FPageAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         switch (position) {
             case 0:
-                return new ToDooFormFragment();
+                return ToDooFormFragment.getInstance(toDoo);
             case 1:
-                return new ToDooItemFragment();
+                return ToDooItemFragment.getInstance(toDoo);
             default:
                 return new Fragment();
         }
@@ -44,7 +47,7 @@ public class FPageAdapter extends FragmentPagerAdapter {
     public CharSequence getPageTitle(int position) {
         switch (position) {
             case 0:
-                return context.getString(R.string.app_name);
+                return context.getString(R.string.todoo);
             case 1:
                 return context.getString(R.string.todoo_items);
         }

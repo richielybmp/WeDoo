@@ -5,6 +5,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.ViewPager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -12,24 +13,28 @@ import butterknife.OnClick;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewParent;
 import android.widget.Toast;
 
 import com.espfullstack.wedoo.adapters.ToDooItemAdapter;
+import com.espfullstack.wedoo.adapters.ToDooPageAdapter;
 import com.espfullstack.wedoo.controllers.ToDooItemController;
 import com.espfullstack.wedoo.pojo.ToDoo;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.tabs.TabLayout;
 
-public class ToDoActivity extends AppCompatActivity {
+public class ToDooActivity extends AppCompatActivity {
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
-    @BindView(R.id.rvToDooItem)
-    RecyclerView rvToDooItem;
+    @BindView(R.id.tabs)
+    TabLayout tabLayout;
 
-    ToDooItemController toDooItemController;
-    ToDooItemAdapter toDooItemAdapter;
+    @BindView(R.id.viewPager)
+    ViewPager viewPager;
 
+    private ToDooPageAdapter toDooPageAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,17 +46,12 @@ public class ToDoActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(R.string.app_name);
 
-        Intent i = getIntent();
-        ToDoo toDoo =  (ToDoo) i.getSerializableExtra("todoos");
+        Bundle bundle = getIntent().getExtras();
+        ToDoo toDoo =  (ToDoo) bundle.getSerializable("todoo");
 
-        toDooItemController = new ToDooItemController(this);
-        toDooItemAdapter = new ToDooItemAdapter(toDooItemController.getAll(toDoo.getId()));
-
-        rvToDooItem.setAdapter(toDooItemAdapter);
-        rvToDooItem.setLayoutManager(new LinearLayoutManager(this));
-        rvToDooItem.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
-
-        Toast.makeText(this, "Titulo"+toDoo.getTitle(), Toast.LENGTH_SHORT).show();
+        toDooPageAdapter = new ToDooPageAdapter(getSupportFragmentManager(), this, toDoo);
+        viewPager.setAdapter(toDooPageAdapter);
+        tabLayout.setupWithViewPager(viewPager);
 
     }
 
