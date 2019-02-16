@@ -97,13 +97,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.btn_logout:
-                FirebaseAuth.getInstance().signOut();
-                Intent signInIntent = new Intent(this.getApplicationContext(), LoginActivity.class);
-                signInIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(signInIntent);
-                finish();
-                Toast.makeText(this, "Log out done!", Toast.LENGTH_SHORT).show();
+            case R.id.btn_profile:
+                Intent i = new Intent(getApplicationContext(), ProfileActivity.class);
+                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(i);
                 break;
             case R.id.about:
                 break;
