@@ -3,9 +3,16 @@ package com.espfullstack.wedoo;
 import android.content.Intent;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -13,14 +20,36 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class SignupActivity extends AppCompatActivity {
 
-    private EditText inputEmail, inputPassword;
-    private Button btnSignIn, btnSignUp, btnResetPassword;
-    private ProgressBar progressBar;
+    @BindView(R.id.inputLayoutEmail)
+    TextInputLayout inputLayoutEmail;
+
+    @BindView(R.id.email)
+    EditText inputEmail;
+
+    @BindView(R.id.inputLayoutPassword)
+    TextInputLayout inputLayoutPassword;
+
+    @BindView(R.id.password)
+    EditText inputPassword;
+
+    @BindView(R.id.sign_in_button)
+    Button btnSignIn;
+
+    @BindView(R.id.sign_up_button)
+    Button btnSignUp;
+
+    @BindView(R.id.btn_reset_password)
+    Button btnResetPassword;
+
+    @BindView(R.id.progressBar)
+    ProgressBar progressBar;
+
     private FirebaseAuth auth;
 
     @Override
@@ -28,29 +57,12 @@ public class SignupActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
 
-        //Get Firebase auth instance
+        ButterKnife.bind(this);
+
         auth = FirebaseAuth.getInstance();
 
-        btnSignIn = (Button) findViewById(R.id.sign_in_button);
-        btnSignUp = (Button) findViewById(R.id.sign_up_button);
-        inputEmail = (EditText) findViewById(R.id.email);
-        inputPassword = (EditText) findViewById(R.id.password);
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        btnResetPassword = (Button) findViewById(R.id.btn_reset_password);
-
-        btnResetPassword.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(SignupActivity.this, ResetPasswordActivity.class));
-            }
-        });
-
-        btnSignIn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        inputEmail.addTextChangedListener(new MyTextWatcher(inputEmail));
+        inputPassword.addTextChangedListener(new MyTextWatcher(inputPassword));
 
         btnSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -60,17 +72,23 @@ public class SignupActivity extends AppCompatActivity {
                 String password = inputPassword.getText().toString().trim();
 
                 if (TextUtils.isEmpty(email)) {
-                    Toast.makeText(getApplicationContext(), "Enter email address!", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getApplicationContext(), "Enter email address!", Toast.LENGTH_SHORT).show();
+                    inputLayoutEmail.setError(getString(R.string.msg_email_error));
+                    requestFocus(inputEmail);
                     return;
                 }
 
                 if (TextUtils.isEmpty(password)) {
-                    Toast.makeText(getApplicationContext(), "Enter password!", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getApplicationContext(), "Enter password!", Toast.LENGTH_SHORT).show();
+                    inputLayoutPassword.setError(getString(R.string.msg_password_error));
+                    requestFocus(inputPassword);
                     return;
                 }
 
                 if (password.length() < 6) {
-                    Toast.makeText(getApplicationContext(), "Password too short, enter minimum 6 characters!", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getApplicationContext(), "Password too short, enter minimum 6 characters!", Toast.LENGTH_SHORT).show();
+                    inputLayoutPassword.setError(getString(R.string.minimum_password));
+                    requestFocus(inputPassword);
                     return;
                 }
 
@@ -103,5 +121,77 @@ public class SignupActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         progressBar.setVisibility(View.GONE);
+    }
+
+    @OnClick(R.id.btn_reset_password)
+    public void showResetPassowrdActivity(){
+        startActivity(new Intent(SignupActivity.this, ResetPasswordActivity.class));
+    }
+
+    @OnClick(R.id.sign_in_button)
+    public void goBack(){
+        finish();
+    }
+
+    private void requestFocus(View view) {
+        if (view.requestFocus()) {
+            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        }
+    }
+
+    private class MyTextWatcher implements TextWatcher {
+
+        private View view;
+
+        private MyTextWatcher(View view) {
+            this.view = view;
+        }
+
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        }
+
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        }
+
+        public void afterTextChanged(Editable editable) {
+            switch (view.getId()) {
+                case R.id.email:
+                    validateEmail();
+                    break;
+                case R.id.password:
+                    validatePassword();
+                    break;
+            }
+        }
+    }
+
+    private boolean validateEmail() {
+        String email = inputEmail.getText().toString().trim();
+
+        if (email.isEmpty() || !isValidEmail(email)) {
+            inputLayoutEmail.setError(getString(R.string.msg_email_error));
+            requestFocus(inputEmail);
+            return false;
+        } else {
+            inputLayoutEmail.setErrorEnabled(false);
+        }
+
+        return true;
+    }
+
+    private boolean validatePassword() {
+        if (inputPassword.getText().toString().trim().isEmpty()) {
+            inputLayoutPassword.setError(getString(R.string.msg_password_error));
+            requestFocus(inputPassword);
+            return false;
+        } else {
+            inputLayoutPassword.setErrorEnabled(false);
+        }
+
+        return true;
+    }
+
+    private static boolean isValidEmail(String email) {
+        return !TextUtils.isEmpty(email) && android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
 }

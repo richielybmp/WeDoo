@@ -30,6 +30,7 @@
             android:src="@mipmap/ic_launcher" />
 
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/inputLayoutEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:theme="@style/Login.EditTextAppearance">
@@ -45,6 +46,7 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/inputLayoutPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:theme="@style/Login.EditTextAppearance"
@@ -78,7 +80,7 @@
             android:background="@null"
             android:text="@string/btn_forgot_password"
             android:textAllCaps="false"
-            android:textColor="@color/colorAccent" />
+            android:textColor="@color/btn_forgot_password" />
 
         <!-- Link to Login Screen -->
 
@@ -95,11 +97,14 @@
     </LinearLayout>
 
     <ProgressBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:id="@+id/progressBar"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_gravity="center|bottom"
-        android:layout_marginBottom="20dp"
-        android:visibility="gone" />
+        android:gravity="center"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

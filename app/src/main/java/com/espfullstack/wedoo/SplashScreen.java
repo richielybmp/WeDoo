@@ -4,6 +4,9 @@ import android.content.Intent;
 import android.os.Handler;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
+
+import com.espfullstack.wedoo.session.SessionMannager;
 
 public class SplashScreen extends AppCompatActivity {
 
@@ -17,9 +20,19 @@ public class SplashScreen extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Intent splashIntent = new Intent(SplashScreen.this, LoginActivity.class);
-                splashIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(splashIntent);
+
+                String token = SessionMannager.getToken(getApplicationContext());
+                Intent i;
+
+                if (TextUtils.isEmpty(token)){
+                    i = new Intent(SplashScreen.this, LoginActivity.class);
+                }
+                else{
+                    i = new Intent(SplashScreen.this, MainActivity.class);
+                }
+
+                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(i);
                 finish();
             }
         },SPLASH_TIME_OUT);

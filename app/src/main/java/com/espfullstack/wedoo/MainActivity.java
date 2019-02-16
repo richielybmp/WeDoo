@@ -84,8 +84,6 @@ public class MainActivity extends AppCompatActivity {
         rvToDo.addOnScrollListener(onScrollListener);
     }
 
-
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);

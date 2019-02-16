@@ -2,16 +2,22 @@ package com.espfullstack.wedoo;
 
 import android.content.Intent;
 import androidx.annotation.NonNull;
+
+import com.espfullstack.wedoo.session.SessionMannager;
 import com.google.android.material.snackbar.Snackbar;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.appcompat.widget.Toolbar;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -25,10 +31,12 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.auth.GoogleAuthProvider;
 
 
@@ -37,81 +45,84 @@ public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "GoogleActivity";
     private static final int RC_SIGN_IN = 9001;
 
-    private EditText inputEmail, inputPassword;
     private FirebaseAuth auth;
-    private ProgressBar progressBar;
-    private Button btnSignup, btnLogin, btnReset;
 
-    private SignInButton btnLoginGoogle;
+    @BindView(R.id.inputLayoutEmail)
+    TextInputLayout inputLayoutEmail;
+
+    @BindView(R.id.email)
+    EditText inputEmail;
+
+    @BindView(R.id.inputLayoutPassword)
+    TextInputLayout inputLayoutPassword;
+
+    @BindView(R.id.password)
+    EditText inputPassword;
+
+    @BindView(R.id.progressBar)
+    ProgressBar progressBar;
+
+    @BindView(R.id.btn_signup)
+    Button btnSignup;
+
+    @BindView(R.id.btn_login)
+    Button btnLogin;
+
+    @BindView(R.id.btn_reset_password)
+    Button btnReset;
+
+    @BindView(R.id.google_signin)
+    SignInButton btnLoginGoogle;
 
     private GoogleSignInClient mGoogleSignInClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // set the view now
         setContentView(R.layout.activity_login);
+
         ButterKnife.bind(this);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        inputEmail = (EditText) findViewById(R.id.email);
-        inputPassword = (EditText) findViewById(R.id.password);
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        btnSignup = (Button) findViewById(R.id.btn_signup);
-        btnLogin = (Button) findViewById(R.id.btn_login);
-        btnReset = (Button) findViewById(R.id.btn_reset_password);
-        btnLoginGoogle = (SignInButton) findViewById(R.id.google_signin);
-
-        // [START config_signin]
-        // Configure Google Sign In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
-        // [END config_signin]
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
-        //Get Firebase auth instance
         auth = FirebaseAuth.getInstance();
 
+        inputEmail.addTextChangedListener(new MyTextWatcher(inputEmail));
+        inputPassword.addTextChangedListener(new MyTextWatcher(inputPassword));
 
-        btnLoginGoogle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                signIn();
-            }
-        });
-
-        btnSignup.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(LoginActivity.this, SignupActivity.class));
-            }
-        });
-
-        btnReset.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(LoginActivity.this, ResetPasswordActivity.class));
-            }
-        });
 
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String email = inputEmail.getText().toString();
+                String email = inputEmail.getText().toString().trim();
                 final String password = inputPassword.getText().toString();
 
                 if (TextUtils.isEmpty(email)) {
-                    Toast.makeText(getApplicationContext(), "Enter email address!", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getApplicationContext(), "Enter email address!", Toast.LENGTH_SHORT).show();
+                    inputLayoutEmail.setError(getString(R.string.msg_email_error));
+                    requestFocus(inputEmail);
                     return;
                 }
 
                 if (TextUtils.isEmpty(password)) {
-                    Toast.makeText(getApplicationContext(), "Enter password!", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getApplicationContext(), "Enter password!", Toast.LENGTH_SHORT).show();
+                    inputLayoutPassword.setError(getString(R.string.msg_password_error));
+                    requestFocus(inputPassword);
+                    return;
+                }
+
+                if (password.length() < 6) {
+                    //Toast.makeText(getApplicationContext(), "Password too short, enter minimum 6 characters!", Toast.LENGTH_SHORT).show();
+                    inputLayoutPassword.setError(getString(R.string.minimum_password));
+                    requestFocus(inputPassword);
                     return;
                 }
 
@@ -129,11 +140,14 @@ public class LoginActivity extends AppCompatActivity {
                                 if (!task.isSuccessful()) {
                                     // there was an error
                                     if (password.length() < 6) {
-                                        inputPassword.setError(getString(R.string.minimum_password));
+                                        //inputPassword.setError(getString(R.string.minimum_password));
+                                        inputLayoutPassword.setError(getString(R.string.minimum_password));
+                                        requestFocus(inputPassword);
                                     } else {
                                         Toast.makeText(LoginActivity.this, getString(R.string.auth_failed), Toast.LENGTH_LONG).show();
                                     }
                                 } else {
+                                    saveLoggedToken();
                                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                     startActivity(intent);
                                     finish();
@@ -144,6 +158,21 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    private void saveLoggedToken() {
+        FirebaseUser mUser = auth.getInstance().getCurrentUser();
+        mUser.getIdToken(true)
+                .addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+                    public void onComplete(@NonNull Task<GetTokenResult> task) {
+                        if (task.isSuccessful()) {
+                            String idToken = task.getResult().getToken();
+                            SessionMannager.saveToken(idToken, getApplicationContext());
+                        } else {
+                            // Handle error -> task.getException();
+                        }
+                    }
+                });
+    }
+
     @Override
     public void onStart() {
         super.onStart();
@@ -152,7 +181,6 @@ public class LoginActivity extends AppCompatActivity {
         updateUI(currentUser);
     }
 
-    // [START onactivityresult]
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -167,19 +195,15 @@ public class LoginActivity extends AppCompatActivity {
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
                 Log.w(TAG, "Google sign in failed", e);
-                // [START_EXCLUDE]
                 updateUI(null);
-                // [END_EXCLUDE]
             }
         }
     }
-    // [END onactivityresult]
 
-    // [START auth_with_google]
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
         Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
         // [START_EXCLUDE silent]
-        //showProgressDialog();
+        progressBar.setVisibility(View.VISIBLE);
         // [END_EXCLUDE]
 
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
@@ -191,6 +215,7 @@ public class LoginActivity extends AppCompatActivity {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithCredential:success");
                             FirebaseUser user = auth.getCurrentUser();
+                            saveLoggedToken();
                             updateUI(user);
                         } else {
                             // If sign in fails, display a message to the user.
@@ -200,19 +225,34 @@ public class LoginActivity extends AppCompatActivity {
                         }
 
                         // [START_EXCLUDE]
-                        //hideProgressDialog();
+                        progressBar.setVisibility(View.GONE);
                         // [END_EXCLUDE]
                     }
                 });
     }
-    // [END auth_with_google]
 
-    // [START signin]
-    private void signIn() {
+    @OnClick(R.id.btn_signup)
+    public void showSignUpActivity(){
+        startActivity(new Intent(LoginActivity.this, SignupActivity.class));
+    }
+
+    @OnClick(R.id.google_signin)
+    public void signIn(){
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
-    // [END signin]
+
+    @OnClick(R.id.btn_reset_password)
+    public void showResetPassowrdActivity(){
+        startActivity(new Intent(LoginActivity.this, ResetPasswordActivity.class));
+    }
+
+    @OnClick(R.id.ivAndroido)
+    public void onSuperSecreto(){
+        Toast.makeText(this, "Voce nao deveria saber disso!", Toast.LENGTH_SHORT).show();
+        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+        finish();
+    }
 
     private void updateUI(FirebaseUser currentUser) {
         if (currentUser != null) {
@@ -221,10 +261,65 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    @OnClick(R.id.ivAndroido)
-    public void onSuperSecreto(){
-        Toast.makeText(this, "Voce nao deveria saber disso!", Toast.LENGTH_SHORT).show();
-        startActivity(new Intent(LoginActivity.this, MainActivity.class));
-        finish();
+    private void requestFocus(View view) {
+        if (view.requestFocus()) {
+            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        }
+    }
+
+    private class MyTextWatcher implements TextWatcher {
+
+        private View view;
+
+        private MyTextWatcher(View view) {
+            this.view = view;
+        }
+
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        }
+
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        }
+
+        public void afterTextChanged(Editable editable) {
+            switch (view.getId()) {
+                case R.id.email:
+                    validateEmail();
+                    break;
+                case R.id.password:
+                    validatePassword();
+                    break;
+            }
+        }
+    }
+
+    private boolean validateEmail() {
+        String email = inputEmail.getText().toString().trim();
+
+        if (email.isEmpty() || !isValidEmail(email)) {
+            inputLayoutEmail.setError(getString(R.string.msg_email_error));
+            requestFocus(inputEmail);
+            return false;
+        } else {
+            inputLayoutEmail.setErrorEnabled(false);
+        }
+
+        return true;
+    }
+
+    private boolean validatePassword() {
+        if (inputPassword.getText().toString().trim().isEmpty()) {
+            inputLayoutPassword.setError(getString(R.string.msg_password_error));
+            requestFocus(inputPassword);
+            return false;
+        } else {
+            inputLayoutPassword.setErrorEnabled(false);
+        }
+
+        return true;
+    }
+
+    private static boolean isValidEmail(String email) {
+        return !TextUtils.isEmpty(email) && android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
 }
