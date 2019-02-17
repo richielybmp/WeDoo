@@ -1,16 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!--Login Activity-->
+    <!--App name-->
+    <string name="app_name">WeDoo</string>
+
+    <!--Login-->
     <string name="email">Email</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Senha</string>
+    <string name="btn_login">ENTRAR</string>
     <string name="register">Registrar</string>
+    <string name="action_sign_in_short">Não possui conta ainda? Registre-se!</string>
     <string name="minimum_password">Senha muito pequena, informe no mínimo 6 caracteres!</string>
     <string name="msg_email_error">Informe um endereço de email válido!</string>
     <string name="msg_password_error">Informe sua senha!</string>
     <string name="auth_failed">Falha na autenticação, verifique seu email e senha ou registre-se!</string>
-    <string name="action_sign_in_short">Não possui conta ainda? Registre-se!</string>
-
     <string name="lbl_forgot_password">Esqueceu sua senha?</string>
+    <string name="btn_link_to_login">Já tenho cadastro. Entrar agora!</string>
+    <string name="btn_forgot_password">Esqueceu sua senha?</string>
+    <string name="btn_reset_password">Alterar senha</string>
+    <string name="btn_back"><![CDATA[<< Voltar]]></string>
     <string name="forgot_password_msg">Nós precisamos que você informe seu email registrado para que possamos lhe enviar instruções para recuperar sua senha.</string>
+
+    <string name="create_new_task">Criar nova tarefa</string>
+    <string name="todoo_title">Título</string>
+    <string name="todoo_description">Descrição</string>
+    <string name="todoo_type">Tipo</string>
+    <string name="todoo_end_date">Encerramento</string>
+    <string name="new_todoo">New ToDoo</string>
+    <string-array name="todo_types">
+        <item>Selecione um tipo</item>
+        <item>Compras</item>
+        <item>Tarefas</item>
+    </string-array>
 
     <string name="todoo_items">Itens</string>
     <string name="update">Atualizar</string>

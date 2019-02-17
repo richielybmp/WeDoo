@@ -79,14 +79,17 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(R.string.app_name);
 
-        toDooController = new ToDooController(this);
-        toDooAdapter = new ToDooAdapter(toDooController.getAll());
-
-        rvToDo.setAdapter(toDooAdapter);
-        rvToDo.setLayoutManager(new LinearLayoutManager(this));
+        loadToDoosList();
         //rvToDo.addItemDecoration(new DividerItemDecoration(view.getContext(), DividerItemDecoration.VERTICAL));
 
         rvToDo.addOnScrollListener(onScrollListener);
+    }
+
+    private void loadToDoosList() {
+        toDooController = new ToDooController(this);
+        toDooAdapter = new ToDooAdapter(toDooController.getAll());
+        rvToDo.setAdapter(toDooAdapter);
+        rvToDo.setLayoutManager(new LinearLayoutManager(this));
     }
 
     @Override
@@ -117,6 +120,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         EventBus.getDefault().register(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadToDoosList();
     }
 
     @Override
