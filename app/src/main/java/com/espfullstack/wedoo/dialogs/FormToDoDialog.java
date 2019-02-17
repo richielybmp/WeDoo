@@ -1,11 +1,15 @@
 package com.espfullstack.wedoo.dialogs;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -16,12 +20,15 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.espfullstack.wedoo.Interface.ISelectedData;
 import com.espfullstack.wedoo.MainActivity;
 import com.espfullstack.wedoo.R;
+import com.espfullstack.wedoo.adapters.ToDooAdapter;
 import com.espfullstack.wedoo.controllers.ToDooController;
 import com.espfullstack.wedoo.pojo.ToDoo;
 
 import java.util.Calendar;
+import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -85,10 +92,13 @@ public class FormToDoDialog extends DialogFragment {
                         toDoo.setDescription(description.getText().toString());
                         toDoo.setEndDate(endDate.getText().toString());
 
-                        if(toDooController.addToDoo(toDoo))
+                        if(toDooController.addToDoo(toDoo)) {
                             Toast.makeText(view.getContext(), "Salvo com sucesso", Toast.LENGTH_SHORT).show();
-                        else
+                            mCallback.onSelectedData(true);
+                        }
+                        else {
                             Toast.makeText(view.getContext(), "Falha ao salvar", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 })
                 .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
@@ -102,5 +112,17 @@ public class FormToDoDialog extends DialogFragment {
         return builder.create();
     }
 
+    private ISelectedData mCallback;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            mCallback = (ISelectedData) context;
+        }
+        catch (ClassCastException e) {
+            Log.d("MyDialog", "Activity doesn't implement the ISelectedData interface");
+        }
+    }
 
 }
