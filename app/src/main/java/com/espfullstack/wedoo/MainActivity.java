@@ -1,11 +1,15 @@
 package com.espfullstack.wedoo;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
 import com.espfullstack.wedoo.adapters.ToDooAdapter;
 import com.espfullstack.wedoo.controllers.ToDooController;
+import com.espfullstack.wedoo.dialogs.FormToDoDialog;
 import com.espfullstack.wedoo.events.ToDooItemClickedEvent;
 import com.espfullstack.wedoo.events.ToDooSavedEvent;
 import com.espfullstack.wedoo.fragments.ToDooFormFragment;
@@ -24,6 +28,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -128,7 +133,9 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.fab)
     public void onFabClick(View view) {
-        startActivityToDoo(null, Constant.NEW_TODOO);
+        //startActivityToDoo(null, Constant.NEW_TODOO);
+        FormToDoDialog formToDoDialog = new FormToDoDialog();
+        formToDoDialog.show(getSupportFragmentManager(), "my_dialog");
     }
 
     private void startActivityToDoo(ToDoo toDoo, int requestCode) {

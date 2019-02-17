@@ -38,6 +38,12 @@
     <string name="todoo_description">Descrição</string>
     <string name="todoo_type">Tipo</string>
     <string name="todoo_end_date">Encerramento</string>
+    <string name="new_todoo">New ToDoo</string>
+    <string-array name="todo_types">
+        <item>Selecione um tipo</item>
+        <item>Compras</item>
+        <item>Tarefas</item>
+    </string-array>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
