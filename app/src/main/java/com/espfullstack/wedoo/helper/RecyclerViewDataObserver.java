@@ -1,5 +1,6 @@
 package com.espfullstack.wedoo.helper;
 
+import android.util.Log;
 import android.view.View;
 
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,10 +16,19 @@ public class RecyclerViewDataObserver extends RecyclerView.AdapterDataObserver {
     }
 
     @Override
-    public void onChanged() {
-        super.onChanged();
+    public void onItemRangeInserted(int positionStart, int itemCount) {
+        Log.d("ONINSERTED", "INSERTED");
         checkIfEmpty();
+        super.onItemRangeInserted(positionStart, itemCount);
     }
+
+    @Override
+    public void onItemRangeRemoved(int positionStart, int itemCount) {
+        Log.d("ONREMOVED", "REMOVED");
+        checkIfEmpty();
+        super.onItemRangeRemoved(positionStart, itemCount);
+    }
+
     private void checkIfEmpty() {
         if (view != null && recyclerView.getAdapter() != null) {
             boolean emptyViewVisible = recyclerView.getAdapter().getItemCount() == 0;

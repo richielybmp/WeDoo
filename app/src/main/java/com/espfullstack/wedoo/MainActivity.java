@@ -1,16 +1,15 @@
 package com.espfullstack.wedoo;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.espfullstack.wedoo.Interface.ISelectedData;
+import com.espfullstack.wedoo.Interface.IToDooAction;
 import com.espfullstack.wedoo.adapters.ToDooAdapter;
 import com.espfullstack.wedoo.controllers.ToDooController;
 import com.espfullstack.wedoo.dialogs.FormToDoDialog;
 import com.espfullstack.wedoo.events.ToDooItemClickedEvent;
-import com.espfullstack.wedoo.helper.Constant;
 import com.espfullstack.wedoo.helper.RecyclerItemTouchHelper;
+import com.espfullstack.wedoo.helper.RecyclerViewDataObserver;
 import com.espfullstack.wedoo.pojo.ToDoo;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -36,7 +35,7 @@ import org.greenrobot.eventbus.Subscribe;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity  implements ISelectedData{
+public class MainActivity extends AppCompatActivity  implements IToDooAction {
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -54,6 +53,8 @@ public class MainActivity extends AppCompatActivity  implements ISelectedData{
     ToDooController toDooController;
     ToDooAdapter toDooAdapter;
 
+    RecyclerViewDataObserver dataObserver;
+
     RecyclerView.OnScrollListener onScrollListener = new RecyclerView.OnScrollListener() {
         @Override
         public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
@@ -69,8 +70,6 @@ public class MainActivity extends AppCompatActivity  implements ISelectedData{
         }
     };
 
-    private int position;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,30 +79,20 @@ public class MainActivity extends AppCompatActivity  implements ISelectedData{
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(R.string.app_name);
 
-        loadToDoosList();
-        //rvToDo.addItemDecoration(new DividerItemDecoration(view.getContext(), DividerItemDecoration.VERTICAL));
+        toDooController = new ToDooController(this);
+        List<ToDoo> toDoos = toDooController.getAll();
+
+        toDooAdapter = new ToDooAdapter(toDoos);
+
+        rvToDo.setAdapter(toDooAdapter);
+        rvToDo.setLayoutManager(new LinearLayoutManager(this));
+
+        dataObserver = new RecyclerViewDataObserver(rvToDo, emptyView);
+        toDooAdapter.registerAdapterDataObserver(dataObserver);
 
         rvToDo.addOnScrollListener(onScrollListener);
 
         new ItemTouchHelper(new RecyclerItemTouchHelper(toDooAdapter)).attachToRecyclerView(rvToDo);
-
-    }
-
-    private void loadToDoosList() {
-        toDooController = new ToDooController(this);
-        List<ToDoo> toDoos = toDooController.getAll();
-        toDooAdapter = new ToDooAdapter(toDoos);
-        rvToDo.setAdapter(toDooAdapter);
-        rvToDo.setLayoutManager(new LinearLayoutManager(this));
-
-        if (toDoos.isEmpty()) {
-            rvToDo.setVisibility(View.GONE);
-            emptyView.setVisibility(View.VISIBLE);
-        }
-        else {
-            rvToDo.setVisibility(View.VISIBLE);
-            emptyView.setVisibility(View.GONE);
-        }
     }
 
     @Override
@@ -137,12 +126,6 @@ public class MainActivity extends AppCompatActivity  implements ISelectedData{
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        loadToDoosList();
-    }
-
-    @Override
     protected void onStop() {
         super.onStop();
         EventBus.getDefault().unregister(this);
@@ -150,46 +133,31 @@ public class MainActivity extends AppCompatActivity  implements ISelectedData{
 
     @Subscribe
     public void onToDooItemClickedEvent(ToDooItemClickedEvent itemClickedEvent) {
-        position = itemClickedEvent.getPosition();
-        startActivityToDoo(itemClickedEvent.getToDoo(), Constant.UPDATE_TODOO);
+        startActivityToDoo(itemClickedEvent.getToDoo());
     }
 
     @OnClick(R.id.fab)
     public void onFabClick(View view) {
-        //startActivityToDoo(null, Constant.NEW_TODOO);
         FormToDoDialog formToDoDialog = new FormToDoDialog();
         formToDoDialog.show(getSupportFragmentManager(), "my_dialog");
     }
 
-    private void startActivityToDoo(ToDoo toDoo, int requestCode) {
+    private void startActivityToDoo(ToDoo toDoo) {
         Intent intent = new Intent(this, ToDooActivity.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable("todoo", toDoo);
         intent.putExtras(bundle);
-        startActivityForResult(intent, requestCode);
+        startActivity(intent);
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        //super.onActivityResult(requestCode, resultCode, data);
-
-        if(resultCode == Activity.RESULT_OK) {
-            ToDoo todo = (ToDoo) data.getSerializableExtra("todoo");
-
-            if(requestCode == Constant.NEW_TODOO) {
-                toDooAdapter.addToDoo(todo);
-            } else if(requestCode == Constant.UPDATE_TODOO) {
-                toDooAdapter.updateToDoo(todo, position);
-            }
-            loadToDoosList();
-        }
+    public void onToDooSaved(ToDoo toDoo) {
+        toDooAdapter.addToDoo(toDoo);
     }
 
     @Override
-    public void onSelectedData(Boolean sucess) {
-        // Use the returned value
-        if (sucess)
-            loadToDoosList();
+    public void onToDooUpdated(ToDoo toDoo, int position) {
+        toDooAdapter.updateToDoo(toDoo, position);
     }
 }
 

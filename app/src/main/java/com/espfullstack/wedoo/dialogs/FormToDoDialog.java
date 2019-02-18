@@ -1,6 +1,5 @@
 package com.espfullstack.wedoo.dialogs;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 
@@ -18,9 +17,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-import com.espfullstack.wedoo.Interface.ISelectedData;
+import com.espfullstack.wedoo.Interface.IToDooAction;
 import com.espfullstack.wedoo.R;
-import com.espfullstack.wedoo.adapters.ToDooAdapter;
 import com.espfullstack.wedoo.controllers.ToDooController;
 import com.espfullstack.wedoo.pojo.ToDoo;
 
@@ -34,7 +32,7 @@ public class FormToDoDialog extends DialogFragment {
     private ToDoo toDoo;
     private EditText title, description, endDate;
     private ToDooController toDooController;
-
+    private int position;
 
     @NonNull
     @Override
@@ -77,8 +75,10 @@ public class FormToDoDialog extends DialogFragment {
 
         //pega dados caso o Dialog seja aberto para edição
         Bundle bundle = getArguments();
+
         if (bundle != null) {
             toDoo = (ToDoo) bundle.getSerializable("toDoData");
+            position = bundle.getInt("position");
             title.setText(toDoo.getTitle());
             description.setText(toDoo.getDescription());
             endDate.setText(toDoo.getEndDate());
@@ -86,8 +86,6 @@ public class FormToDoDialog extends DialogFragment {
             spinner.setSelection(((ArrayAdapter<String>) spinner.getAdapter()).getPosition(toDoo.getConvertedType()));
 
         }
-
-
 
         builder.setView(inflater.inflate(R.layout.dialog_form_add_todo, null))
                 .setPositiveButton(bundle != null ? "Atualizar" : "Cadastrar", new DialogInterface.OnClickListener() {
@@ -99,9 +97,9 @@ public class FormToDoDialog extends DialogFragment {
                         toDoo.setType(toDoo.convertTypeToInt(spinner.getSelectedItem().toString()));
 
                         if (bundle != null) {
-                            updateToDo(view);
+                            updateToDo(view.getContext(), position);
                         } else {
-                            newTodo(view);
+                            newTodo(view.getContext());
                         }
                     }
                 })
@@ -115,32 +113,32 @@ public class FormToDoDialog extends DialogFragment {
         return builder.create();
     }
 
-        private void updateToDo (View view){
+        private void updateToDo (Context context, int position){
             if (toDooController.updateToDoo(toDoo)) {
-                Toast.makeText(view.getContext(), "Atualizado com sucesso", Toast.LENGTH_SHORT).show();
-                mCallback.onSelectedData(true);
+                Toast.makeText(context, "Atualizado com sucesso", Toast.LENGTH_SHORT).show();
+                mCallback.onToDooUpdated(toDoo, position);
             }else {
-                Toast.makeText(view.getContext(), "Erro ao atualizado ToDoo", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Erro ao atualizado ToDoo", Toast.LENGTH_SHORT).show();
             }
         }
 
-        private void newTodo (View view){
+        private void newTodo (Context context){
             if (toDooController.addToDoo(toDoo)) {
-                Toast.makeText(view.getContext(), "Salvo com sucesso", Toast.LENGTH_SHORT).show();
-                mCallback.onSelectedData(true);
+                Toast.makeText(context, "Salvo com sucesso", Toast.LENGTH_SHORT).show();
+                mCallback.onToDooSaved(toDoo);
             } else {
-                Toast.makeText(view.getContext(), "Falha ao salvar ToDoo", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Falha ao salvar ToDoo", Toast.LENGTH_SHORT).show();
             }
         }
-        private ISelectedData mCallback;
+        private IToDooAction mCallback;
 
         @Override
         public void onAttach (Context context){
             super.onAttach(context);
             try {
-                mCallback = (ISelectedData) context;
+                mCallback = (IToDooAction) context;
             } catch (ClassCastException e) {
-                Log.d("MyDialog", "Activity doesn't implement the ISelectedData interface");
+                Log.d("MyDialog", "Activity doesn't implement the IToDooAction interface");
             }
         }
 

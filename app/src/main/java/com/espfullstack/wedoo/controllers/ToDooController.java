@@ -62,12 +62,7 @@ public class ToDooController {
             database.endTransaction();
         }
 
-        if(resultado > 0) {
-            toDoo.setId((int) resultado);
-            return true;
-        }
-
-        return false;
+        return resultado > 0;
     }
 
     public void addAll(List<ToDoo> toDooList) {

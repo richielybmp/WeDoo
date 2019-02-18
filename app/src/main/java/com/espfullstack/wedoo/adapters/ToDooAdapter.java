@@ -118,7 +118,9 @@ public class ToDooAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 public boolean onLongClick(View v) {
                     FormToDoDialog formToDoDialog = new FormToDoDialog();
                     Bundle toDoData = new Bundle();
-                    toDoData.putSerializable("toDoData", toDooList.get(getAdapterPosition()));
+                    int adapterPosition = getAdapterPosition();
+                    toDoData.putSerializable("toDoData", toDooList.get(adapterPosition));
+                    toDoData.putInt("position", adapterPosition);
                     formToDoDialog.setArguments(toDoData);
                     formToDoDialog.show(((AppCompatActivity) todoView.getContext()).getSupportFragmentManager(), "dialog_edit_todo");
 
