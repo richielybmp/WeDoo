@@ -28,9 +28,9 @@ public class ToDooPageAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         switch (position) {
             case 0:
-                return ToDooFormFragment.getInstance(toDoo);
-            case 1:
                 return ToDooItemFragment.getInstance(toDoo);
+            case 1:
+            return ToDooFormFragment.getInstance(toDoo);
             default:
                 return new Fragment();
         }
@@ -47,9 +47,9 @@ public class ToDooPageAdapter extends FragmentPagerAdapter {
     public CharSequence getPageTitle(int position) {
         switch (position) {
             case 0:
-                return context.getString(R.string.todoo);
-            case 1:
                 return context.getString(R.string.todoo_items);
+            case 1:
+                return context.getString(R.string.todoo);
         }
         return null;
     }

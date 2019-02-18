@@ -1,17 +1,22 @@
 package com.espfullstack.wedoo.adapters;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnItemLongClick;
 
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.espfullstack.wedoo.R;
+import com.espfullstack.wedoo.dialogs.FormToDoDialog;
 import com.espfullstack.wedoo.events.ToDooItemClickedEvent;
 import com.espfullstack.wedoo.helper.ColorUtil;
 import com.espfullstack.wedoo.pojo.ToDoo;
@@ -94,6 +99,20 @@ public class ToDooAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             todoView = itemView;
             todoView.setOnClickListener(this);
             ButterKnife.bind(this, itemView);
+
+            todoView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    FormToDoDialog formToDoDialog = new FormToDoDialog();
+                    Bundle toDoData = new Bundle();
+                    toDoData.putSerializable("toDoData", toDooList.get(getAdapterPosition()));
+                    formToDoDialog.setArguments(toDoData);
+                    formToDoDialog.show(((AppCompatActivity) todoView.getContext()).getSupportFragmentManager(), "dialog_edit_todo");
+
+                    return true;
+                }
+            });
+
         }
 
         void bind(ToDoo toDoo) {
@@ -109,5 +128,11 @@ public class ToDooAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             ToDoo toDoo = toDooList.get(position);
             EventBus.getDefault().post(new ToDooItemClickedEvent(toDoo, position));
         }
+
+//        @Override
+//        public boolean onLongClick(View v) {
+//            Toast.makeText(todoView.getContext(), "Long click detected", Toast.LENGTH_SHORT).show();
+//            return true;
+//        }
     }
 }

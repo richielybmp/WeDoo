@@ -63,11 +63,22 @@ public class ToDoo implements Serializable {
         this.type = type;
     }
 
+    public void setStringType(String type){
+        this.setType(type.equals("Tasks") ? TAREFA : COMPRA);
+    }
+
     public String getEndDate() {
         return endDate;
     }
 
     public void setEndDate(String endDate) {
         this.endDate = endDate;
+    }
+
+    public int convertTypeToInt(String type){
+        return type.equals("Tasks") ? TAREFA : COMPRA;
+    }
+    public String getConvertedType(){
+        return this.type == TAREFA ? "Tasks" : "Shops";
     }
 }
