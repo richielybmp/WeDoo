@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.espfullstack.wedoo.Interface.ISelectedData;
 import com.espfullstack.wedoo.adapters.ToDooAdapter;
 import com.espfullstack.wedoo.controllers.ToDooController;
 import com.espfullstack.wedoo.dialogs.FormToDoDialog;
@@ -33,12 +34,15 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.List;
+
+public class MainActivity extends AppCompatActivity  implements ISelectedData {
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -46,6 +50,9 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.rvToDo)
     @Nullable
     RecyclerView rvToDo;
+
+    @BindView(R.id.emptyList)
+    TextView emptyView;
 
     @BindView(R.id.fab)
     FloatingActionButton fab;
@@ -87,9 +94,19 @@ public class MainActivity extends AppCompatActivity {
 
     private void loadToDoosList() {
         toDooController = new ToDooController(this);
-        toDooAdapter = new ToDooAdapter(toDooController.getAll());
+        List<ToDoo> toDoos = toDooController.getAll();
+        toDooAdapter = new ToDooAdapter(toDoos);
         rvToDo.setAdapter(toDooAdapter);
         rvToDo.setLayoutManager(new LinearLayoutManager(this));
+
+        if (toDoos.isEmpty()) {
+            rvToDo.setVisibility(View.GONE);
+            emptyView.setVisibility(View.VISIBLE);
+        }
+        else {
+            rvToDo.setVisibility(View.VISIBLE);
+            emptyView.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -167,6 +184,18 @@ public class MainActivity extends AppCompatActivity {
             } else if(requestCode == Constant.UPDATE_TODOO) {
                 toDooAdapter.updateToDoo(todo, position);
             }
+            loadToDoosList();
         }
     }
+
+    @Override
+    public void onSelectedData(Boolean sucess) {
+        // Use the returned value
+        if (sucess)
+            loadToDoosList();
+    }
 }
+
+
+
+
