@@ -78,12 +78,12 @@ public class FormToDoDialog extends DialogFragment {
         //pega dados caso o Dialog seja aberto para edição
         Bundle bundle = getArguments();
         if (bundle != null) {
-            ToDoo todo = (ToDoo) bundle.getSerializable("toDoData");
-            title.setText(todo.getTitle());
-            description.setText(todo.getDescription());
-            endDate.setText(todo.getEndDate());
-            endDate.setText(todo.getEndDate());
-            spinner.setSelection(((ArrayAdapter<String>) spinner.getAdapter()).getPosition(todo.getConvertedType()));
+            toDoo = (ToDoo) bundle.getSerializable("toDoData");
+            title.setText(toDoo.getTitle());
+            description.setText(toDoo.getDescription());
+            endDate.setText(toDoo.getEndDate());
+            endDate.setText(toDoo.getEndDate());
+            spinner.setSelection(((ArrayAdapter<String>) spinner.getAdapter()).getPosition(toDoo.getConvertedType()));
 
         }
 
