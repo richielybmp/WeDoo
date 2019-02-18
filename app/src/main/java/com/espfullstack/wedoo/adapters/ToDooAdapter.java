@@ -19,6 +19,7 @@ import com.espfullstack.wedoo.R;
 import com.espfullstack.wedoo.dialogs.FormToDoDialog;
 import com.espfullstack.wedoo.events.ToDooItemClickedEvent;
 import com.espfullstack.wedoo.helper.ColorUtil;
+import com.espfullstack.wedoo.helper.RecyclerItemTouchHelper;
 import com.espfullstack.wedoo.pojo.ToDoo;
 
 import org.greenrobot.eventbus.EventBus;
@@ -26,7 +27,7 @@ import org.greenrobot.eventbus.EventBus;
 import java.util.List;
 import java.util.Random;
 
-public class ToDooAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class ToDooAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements RecyclerItemTouchHelper.AnimationListener {
     private List<ToDoo> toDooList;
 
     Random random = new Random();
@@ -86,7 +87,19 @@ public class ToDooAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         notifyItemChanged(position);
     }
 
-    class ToDoViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    @Override
+    public void onMove(int fromPosition, int toPosition) {
+        toDooList.add(toPosition, toDooList.remove(fromPosition));
+        notifyItemMoved(fromPosition, toPosition);
+    }
+
+    @Override
+    public void onSwiped(int direction, int position) {
+        toDooList.remove(position);
+        notifyItemRemoved(position);
+    }
+
+    public class ToDoViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         @BindView(R.id.tvToDoTitle)
         TextView tvTitle;
         @BindView(R.id.cvToDoo)

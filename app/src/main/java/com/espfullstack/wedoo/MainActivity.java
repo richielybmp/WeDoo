@@ -1,9 +1,6 @@
 package com.espfullstack.wedoo;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -12,37 +9,34 @@ import com.espfullstack.wedoo.adapters.ToDooAdapter;
 import com.espfullstack.wedoo.controllers.ToDooController;
 import com.espfullstack.wedoo.dialogs.FormToDoDialog;
 import com.espfullstack.wedoo.events.ToDooItemClickedEvent;
-import com.espfullstack.wedoo.events.ToDooSavedEvent;
-import com.espfullstack.wedoo.fragments.ToDooFormFragment;
 import com.espfullstack.wedoo.helper.Constant;
+import com.espfullstack.wedoo.helper.RecyclerItemTouchHelper;
 import com.espfullstack.wedoo.pojo.ToDoo;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.auth.FirebaseAuth;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity  implements ISelectedData {
+public class MainActivity extends AppCompatActivity  implements ISelectedData{
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -90,6 +84,9 @@ public class MainActivity extends AppCompatActivity  implements ISelectedData {
         //rvToDo.addItemDecoration(new DividerItemDecoration(view.getContext(), DividerItemDecoration.VERTICAL));
 
         rvToDo.addOnScrollListener(onScrollListener);
+
+        new ItemTouchHelper(new RecyclerItemTouchHelper(toDooAdapter)).attachToRecyclerView(rvToDo);
+
     }
 
     private void loadToDoosList() {
