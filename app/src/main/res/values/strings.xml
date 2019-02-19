@@ -52,6 +52,8 @@
     <string name="err_description_dialog">"Enter a description"</string>
     <string name="err_endDate_dialog">"Enter a date"</string>
     <string name="err_type_dialog">"Enter a type"</string>
+    <string name="snack_bar_undo">Undo</string>
+    <string name="todoo_deleted">ToDoo deleted!</string>
 
 </resources>
 

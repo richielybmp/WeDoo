@@ -8,6 +8,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnItemLongClick;
 
+import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,28 +17,38 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.espfullstack.wedoo.Interface.IToDooAction;
 import com.espfullstack.wedoo.R;
 import com.espfullstack.wedoo.dialogs.FormToDoDialog;
 import com.espfullstack.wedoo.events.ToDooItemClickedEvent;
 import com.espfullstack.wedoo.helper.ColorUtil;
 import com.espfullstack.wedoo.helper.RecyclerItemTouchHelper;
 import com.espfullstack.wedoo.pojo.ToDoo;
+import com.espfullstack.wedoo.session.SessionMannager;
+import com.google.android.material.snackbar.Snackbar;
 
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
 import java.util.Random;
 
-public class ToDooAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements RecyclerItemTouchHelper.AnimationListener {
+public class ToDooAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+
     private List<ToDoo> toDooList;
-
-    Random random = new Random();
-
+    private Random random = new Random();
     private float h;
 
-    public ToDooAdapter(List<ToDoo> toDooList) {
+    private ToDoo deletedToDoo;
+    private int deletedToDooPosition;
+
+    private Activity activity;
+    private IToDooAction toDooAction;
+
+    public ToDooAdapter(List<ToDoo> toDooList, Activity activity) {
         this.toDooList = toDooList;
         h = random.nextFloat();
+        this.activity = activity;
+        toDooAction = (IToDooAction) activity;
     }
 
     @NonNull
@@ -87,16 +99,40 @@ public class ToDooAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         notifyItemChanged(position);
     }
 
-    @Override
     public void onMove(int fromPosition, int toPosition) {
         toDooList.add(toPosition, toDooList.remove(fromPosition));
         notifyItemMoved(fromPosition, toPosition);
     }
 
-    @Override
-    public void onSwiped(int direction, int position) {
+    public void deleteItem(int position) {
+        deletedToDoo = toDooList.get(position);
+        deletedToDooPosition = position;
         toDooList.remove(position);
         notifyItemRemoved(position);
+        SessionMannager.flagForDelete(activity, deletedToDoo.getId());
+        showUndoSnackbar();
+    }
+
+    private void showUndoSnackbar() {
+        View view = activity.findViewById(R.id.clMainActivity);
+        Snackbar snackbar = Snackbar.make(view, R.string.todoo_deleted,
+                Snackbar.LENGTH_LONG);
+        snackbar.setAction(R.string.snack_bar_undo, v -> undoDelete()).addCallback(new Snackbar.Callback() {
+            @Override
+            public void onDismissed(Snackbar transientBottomBar, int event) {
+                super.onDismissed(transientBottomBar, event);
+                if(Snackbar.Callback.DISMISS_EVENT_ACTION != event) {
+                    toDooAction.onToDooDeleted(deletedToDoo);
+                }
+            }
+        });
+        snackbar.show();
+    }
+
+    private void undoDelete() {
+        SessionMannager.removeFlagged(activity);
+        toDooList.add(deletedToDooPosition, deletedToDoo);
+        notifyItemInserted(deletedToDooPosition);
     }
 
     public class ToDoViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{

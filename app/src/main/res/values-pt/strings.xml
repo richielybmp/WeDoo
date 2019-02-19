@@ -47,4 +47,6 @@
     <string name="err_description_dialog">"Informe uma descrição"</string>
     <string name="err_endDate_dialog">"Informe uma data"</string>
     <string name="err_type_dialog">"Informe um tipo"</string>
+    <string name="snack_bar_undo">Desfazer</string>
+    <string name="todoo_deleted">ToDoo removido!</string>
 </resources>

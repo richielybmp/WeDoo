@@ -10,7 +10,9 @@ import com.espfullstack.wedoo.dialogs.FormToDoDialog;
 import com.espfullstack.wedoo.events.ToDooItemClickedEvent;
 import com.espfullstack.wedoo.helper.RecyclerItemTouchHelper;
 import com.espfullstack.wedoo.helper.RecyclerViewDataObserver;
+import com.espfullstack.wedoo.helper.SwipeCallback;
 import com.espfullstack.wedoo.pojo.ToDoo;
+import com.espfullstack.wedoo.session.SessionMannager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import androidx.annotation.NonNull;
@@ -35,7 +37,7 @@ import org.greenrobot.eventbus.Subscribe;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity  implements IToDooAction {
+public class MainActivity extends AppCompatActivity implements IToDooAction {
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -80,9 +82,10 @@ public class MainActivity extends AppCompatActivity  implements IToDooAction {
         getSupportActionBar().setTitle(R.string.app_name);
 
         toDooController = new ToDooController(this);
+        checkFlaggedToDelete();
         List<ToDoo> toDoos = toDooController.getAll();
 
-        toDooAdapter = new ToDooAdapter(toDoos);
+        toDooAdapter = new ToDooAdapter(toDoos, this);
 
         rvToDo.setAdapter(toDooAdapter);
         rvToDo.setLayoutManager(new LinearLayoutManager(this));
@@ -91,8 +94,20 @@ public class MainActivity extends AppCompatActivity  implements IToDooAction {
         toDooAdapter.registerAdapterDataObserver(dataObserver);
 
         rvToDo.addOnScrollListener(onScrollListener);
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new SwipeCallback(toDooAdapter, this));
+        itemTouchHelper.attachToRecyclerView(rvToDo);
+    }
 
-        new ItemTouchHelper(new RecyclerItemTouchHelper(toDooAdapter)).attachToRecyclerView(rvToDo);
+    private void checkFlaggedToDelete() {
+        int flaggedId = SessionMannager.getFlagged(this);
+        if (flaggedId != 0) {
+            deleteAndRemoveFlag(flaggedId);
+        }
+    }
+
+    private void deleteAndRemoveFlag(int flaggedId) {
+        if(toDooController.delete(flaggedId))
+            SessionMannager.removeFlagged(this);
     }
 
     @Override
@@ -158,6 +173,11 @@ public class MainActivity extends AppCompatActivity  implements IToDooAction {
     @Override
     public void onToDooUpdated(ToDoo toDoo, int position) {
         toDooAdapter.updateToDoo(toDoo, position);
+    }
+
+    @Override
+    public void onToDooDeleted(ToDoo toDoo) {
+        deleteAndRemoveFlag(toDoo.getId());
     }
 }
 

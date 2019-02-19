@@ -108,7 +108,7 @@ public class ToDooController {
         return todoList;
     }
 
-    public int delete(int id) {
+    public boolean delete(int id) {
         int result = 0;
         SQLiteDatabase database = databaseHelper.getDatabase();
         database.beginTransaction();
@@ -118,7 +118,7 @@ public class ToDooController {
         } finally {
             database.endTransaction();
         }
-        return result;
+        return result > 0;
     }
 
     public boolean saveToDoo(ToDoo toDoo) {
