@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
@@ -10,7 +7,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="80dp"
-            android:background="@color/btn_login"
+            android:background="@color/colorPrimary"
             android:orientation="horizontal"
             android:gravity="center">
 
@@ -19,7 +16,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/new_todoo"
-                android:textColor="@color/btn_login_bg"
+                android:textColor="@color/white"
                 android:textSize="25sp"/>
 
         </LinearLayout>
@@ -31,7 +28,10 @@
             android:layout_marginStart="5dp"
             android:layout_marginTop="15dp"
             android:layout_marginEnd="5dp"
-            android:hint="@string/todoo_title" />
+            android:hint="@string/todoo_title"
+            android:backgroundTint="@color/colorPrimary"
+            android:textColorLink="@color/colorPrimaryDark"
+            android:textCursorDrawable="@color/colorPrimary" />
 
         <EditText
             android:id="@+id/edtDescricao_dialog"
@@ -40,7 +40,10 @@
             android:layout_marginStart="5dp"
             android:layout_marginTop="10dp"
             android:layout_marginEnd="5dp"
-            android:hint="@string/todoo_description" />
+            android:hint="@string/todoo_description"
+            android:backgroundTint="@color/colorPrimary"
+            android:textColorLink="@color/colorPrimaryDark"
+            android:textCursorDrawable="@color/colorPrimary" />
 
         <Spinner
             android:id="@+id/spTypeTodo"
@@ -49,7 +52,11 @@
             android:layout_marginStart="5dp"
             android:layout_marginTop="10dp"
             android:layout_marginEnd="5dp"
-            style="@style/Base.Widget.AppCompat.Spinner.Underlined"/>
+            style="@style/Base.Widget.AppCompat.Spinner.Underlined"
+            android:backgroundTint="@color/colorPrimary"
+            android:textColorLink="@color/colorPrimaryDark"
+            android:textCursorDrawable="@color/colorPrimary"
+            />
 
         <EditText
             android:id="@+id/edtEncerramento_dialog"
@@ -58,7 +65,10 @@
             android:layout_marginStart="5dp"
             android:layout_marginTop="10dp"
             android:layout_marginEnd="5dp"
-            android:hint="@string/todoo_end_date" />
-
+            android:inputType="date"
+            android:hint="@string/todoo_end_date"
+            android:backgroundTint="@color/colorPrimary"
+            android:textColorLink="@color/colorPrimaryDark"
+            android:textCursorDrawable="@color/colorPrimary" />
 
 </LinearLayout>

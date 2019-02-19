@@ -30,7 +30,7 @@ public class ToDooPageAdapter extends FragmentPagerAdapter {
             case 0:
                 return ToDooItemFragment.getInstance(toDoo);
             case 1:
-            return ToDooFormFragment.getInstance(toDoo);
+                return ToDooFormFragment.getInstance(toDoo);
             default:
                 return new Fragment();
         }
