@@ -151,7 +151,7 @@ public class MainActivity extends AppCompatActivity  implements IToDooAction {
     }
 
     @Override
-    public void onToDooSaved(ToDoo toDoo) {
+    public void onToDooInserted(ToDoo toDoo) {
         toDooAdapter.addToDoo(toDoo);
     }
 

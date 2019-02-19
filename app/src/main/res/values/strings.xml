@@ -45,5 +45,13 @@
     <string name="no_todoo">There\'s no ToDoo created.</string>
 
     <string name="profile">Profile</string>
+    <string name="cancel">Cancel</string>
+    <string name="add_new">Create</string>
+
+    <string name="err_title_dialog">"Enter a title"</string>
+    <string name="err_description_dialog">"Enter a description"</string>
+    <string name="err_endDate_dialog">"Enter a date"</string>
+    <string name="err_type_dialog">"Enter a type"</string>
+
 </resources>
 

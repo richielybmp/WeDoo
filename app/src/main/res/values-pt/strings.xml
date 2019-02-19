@@ -40,4 +40,11 @@
     <string name="no_todoo">Não há ToDoo criado.</string>
 
     <string name="profile">Perfil</string>
+    <string name="cancel">Cancelar</string>
+    <string name="add_new">Criar</string>
+
+    <string name="err_title_dialog">"Informe um título"</string>
+    <string name="err_description_dialog">"Informe uma descrição"</string>
+    <string name="err_endDate_dialog">"Informe uma data"</string>
+    <string name="err_type_dialog">"Informe um tipo"</string>
 </resources>

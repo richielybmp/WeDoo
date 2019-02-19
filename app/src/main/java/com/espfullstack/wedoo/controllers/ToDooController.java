@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.espfullstack.wedoo.adapters.ToDooAdapter;
 import com.espfullstack.wedoo.helper.DatabaseHelper;
 import com.espfullstack.wedoo.pojo.ToDoo;
 
