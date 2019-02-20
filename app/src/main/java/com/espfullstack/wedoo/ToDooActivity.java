@@ -56,6 +56,7 @@ public class ToDooActivity extends AppCompatActivity {
         toDooItemController = new ToDooItemController(this);
 
         toDooItems = toDooItemController.getAll(toDoo.getId());
+        // TODO: atribuir os TodooItems na a List<ToDooItem> do ToDoo
 
         toDooItemAdapter = new ToDooItemAdapter(toDooItems);
 

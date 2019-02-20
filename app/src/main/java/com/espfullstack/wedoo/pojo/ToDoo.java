@@ -14,12 +14,13 @@ public class ToDoo implements Serializable {
     public static final int COMPRA = 1;
     //+++++
 
-
     private int id;
     private String title;
     private String description;
     private int type;
     private String endDate;
+
+    // TODO: criar a List<ToDooItem>
 
     public ToDoo() {
     }
