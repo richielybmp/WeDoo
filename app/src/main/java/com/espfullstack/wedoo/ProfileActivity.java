@@ -14,6 +14,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
+import com.bumptech.glide.request.RequestOptions;
 import com.espfullstack.wedoo.session.SessionMannager;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -53,7 +55,8 @@ public class ProfileActivity extends AppCompatActivity {
                 if (photoUrl == null) {
                     photoUrl = Uri.parse("https://goo.gl/pNsBHk");
                 }
-                Glide.with(this).load(photoUrl).into(userPhoto);
+                Glide.with(this).load(photoUrl)
+                        .apply(RequestOptions.bitmapTransform(new CircleCrop())).into(userPhoto);
             }
             else {
                 redirectToLogin();
