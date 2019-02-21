@@ -41,10 +41,10 @@ public class ToDooAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private ToDoo deletedToDoo;
     private int deletedToDooPosition;
 
-    private Activity activity;
+    private AppCompatActivity activity;
     private IToDooAction toDooAction;
 
-    public ToDooAdapter(List<ToDoo> toDooList, Activity activity) {
+    public ToDooAdapter(List<ToDoo> toDooList, AppCompatActivity activity) {
         this.toDooList = toDooList;
         h = random.nextFloat();
         this.activity = activity;
@@ -135,6 +135,16 @@ public class ToDooAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         notifyItemInserted(deletedToDooPosition);
     }
 
+    public void editItem(int position) {
+        FormToDoDialog formToDoDialog = new FormToDoDialog();
+        Bundle toDoData = new Bundle();
+        toDoData.putSerializable("toDoData", toDooList.get(position));
+        toDoData.putInt("position", position);
+        formToDoDialog.setArguments(toDoData);
+        formToDoDialog.show(activity.getSupportFragmentManager(), "dialog_edit_todo");
+        notifyItemChanged(position);
+    }
+
     public class ToDoViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         @BindView(R.id.tvToDoTitle)
         TextView tvTitle;
@@ -148,22 +158,6 @@ public class ToDooAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             todoView = itemView;
             todoView.setOnClickListener(this);
             ButterKnife.bind(this, itemView);
-
-            todoView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    FormToDoDialog formToDoDialog = new FormToDoDialog();
-                    Bundle toDoData = new Bundle();
-                    int adapterPosition = getAdapterPosition();
-                    toDoData.putSerializable("toDoData", toDooList.get(adapterPosition));
-                    toDoData.putInt("position", adapterPosition);
-                    formToDoDialog.setArguments(toDoData);
-                    formToDoDialog.show(((AppCompatActivity) todoView.getContext()).getSupportFragmentManager(), "dialog_edit_todo");
-
-                    return true;
-                }
-            });
-
         }
 
         void bind(ToDoo toDoo) {
