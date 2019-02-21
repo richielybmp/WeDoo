@@ -29,6 +29,7 @@
             android:layout_marginTop="15dp"
             android:layout_marginEnd="5dp"
             android:hint="@string/todoo_title"
+            android:inputType="textCapSentences"
             android:backgroundTint="@color/colorPrimary"
             android:textColorLink="@color/colorPrimaryDark"
             android:textCursorDrawable="@color/colorPrimary" />
@@ -41,6 +42,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginEnd="5dp"
             android:hint="@string/todoo_description"
+            android:inputType="textCapSentences"
             android:backgroundTint="@color/colorPrimary"
             android:textColorLink="@color/colorPrimaryDark"
             android:textCursorDrawable="@color/colorPrimary" />

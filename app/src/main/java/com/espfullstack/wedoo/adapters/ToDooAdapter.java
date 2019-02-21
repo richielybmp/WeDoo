@@ -148,6 +148,10 @@ public class ToDooAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public class ToDoViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         @BindView(R.id.tvToDoTitle)
         TextView tvTitle;
+
+        @BindView(R.id.tvToDoItemCount)
+        TextView tvToDooItemCount;
+
         @BindView(R.id.cvToDoo)
         CardView cvToDoo;
 
@@ -165,6 +169,10 @@ public class ToDooAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             int color = ColorUtil.generateColor(h);
             cvToDoo.setBackgroundColor(color);
             tvTitle.setText(toDoo.getTitle());
+//            TODO: fazer o bind do textview com a quantidade de ToDoosItems
+//            tvToDooItemCount.setText(toDoo.getToDooItemCount());
+//            ou
+//            tvToDooItemCount.setText(toDoo.todoItems.size());
         }
 
         @Override
