@@ -20,6 +20,7 @@ public class SQLiteStrings {
             + ToDooItem.ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
             + ToDooItem.TITLE + " TEXT,"
             + ToDooItem.DESCRIPTION + " TEXT,"
+            + ToDooItem.STATUS + " INTEGER DEFAULT 0,"
             + ToDooItem.FK + " INTEGER,"
             + "FOREIGN KEY(" + ToDooItem.FK + ") REFERENCES " + ToDoo.TABLE + "(" + ToDoo.ID + ") ON DELETE CASCADE"
             + ")";

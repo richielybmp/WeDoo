@@ -86,8 +86,10 @@ public class ToDooActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()){
+            //TODO Adicionar eventBus
             case R.id.btn_add_toolbar:
                 Intent i = new Intent(this, FormToDoItemActivity.class);
+                i.putExtra("todoo", toDoo);
                 startActivity(i);
                 overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             break;

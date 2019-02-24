@@ -6,10 +6,12 @@ public class ToDooItem {
     public static final String FK = "fk_todoo";
     public static final String TITLE = "title";
     public static final String DESCRIPTION = "description";
+    public static final String STATUS = "status";
 
     private int id;
     private String title;
     private String description;
+    private int status;
 
     public ToDooItem() {
     }
@@ -41,5 +43,14 @@ public class ToDooItem {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        if(status == 0 | status == 1)
+            this.status = status;
     }
 }

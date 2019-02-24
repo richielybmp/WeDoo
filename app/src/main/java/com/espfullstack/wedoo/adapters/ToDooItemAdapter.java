@@ -58,6 +58,8 @@ public class ToDooItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     class TodooItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         @BindView(R.id.tvToDoItemTitle)
+        TextView txtTitle;
+        @BindView(R.id.tvToDoItemDescription)
         TextView txtDescription;
         View todoItemView;
 
@@ -74,6 +76,7 @@ public class ToDooItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         }
 
         void bind(ToDooItem toDooItem){
+            txtTitle.setText(toDooItem.getTitle());
             txtDescription.setText(toDooItem.getDescription());
         }
 

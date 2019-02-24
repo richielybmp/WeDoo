@@ -89,7 +89,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <EditText
-                android:id="@+id/editText"
+                android:id="@+id/edt_title"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:hint="@string/todoo_title" />
@@ -109,7 +109,7 @@
             app:layout_constraintTop_toBottomOf="@+id/inputLayoutTitle">
 
             <EditText
-                android:id="@+id/edit_text"
+                android:id="@+id/edt_description"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="top"
@@ -120,7 +120,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabToDooItem"
+        android:id="@+id/fab_createToDooItem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
