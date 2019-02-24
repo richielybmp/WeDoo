@@ -55,5 +55,9 @@
     <string name="snack_bar_undo">Undo</string>
     <string name="todoo_deleted">ToDoo deleted!</string>
 
+
+    <!--FormToDo Item Activity-->
+    <string name="title_activity">New Task</string>
+
 </resources>
 

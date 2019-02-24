@@ -36,4 +36,11 @@
         <item name="android:textColor">@color/colorAccent</item>
     </style>
 
+    <!--App custom theme-->
+    <style name="AppTheme.NoActionBarForm" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorAccent">@color/amber</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+    </style>
+
 </resources>
