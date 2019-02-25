@@ -1,6 +1,8 @@
 package com.espfullstack.wedoo.pojo;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ToDoo implements Serializable {
     public static final String TABLE = "todoos";
@@ -19,10 +21,10 @@ public class ToDoo implements Serializable {
     private String description;
     private int type;
     private String endDate;
-
-    // TODO: criar a List<ToDooItem>
+    private List<ToDooItem> toDooItemList;
 
     public ToDoo() {
+        this.toDooItemList = new ArrayList<>();
     }
 
     public ToDoo(String title, String description, int type, String endDate) {
@@ -30,6 +32,15 @@ public class ToDoo implements Serializable {
         this.description = description;
         this.type = type;
         this.endDate = endDate;
+        this.toDooItemList = new ArrayList<>();
+    }
+
+    public List<ToDooItem> getToDooItemList() {
+        return toDooItemList;
+    }
+
+    public void setToDooItemList(final List<ToDooItem> toDooItemList) {
+        this.toDooItemList = new ArrayList<>(toDooItemList);
     }
 
     public int getId() {

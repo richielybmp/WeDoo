@@ -1,14 +1,16 @@
 package com.espfullstack.wedoo.pojo;
 
-public class ToDooItem {
-    public static final String TABLE = "ITENS";
+import java.io.Serializable;
+
+public class ToDooItem implements Serializable {
+    public static final String TABLE = "todoos_items";
     public static final String ID = "id";
     public static final String FK = "fk_todoo";
     public static final String TITLE = "title";
     public static final String DESCRIPTION = "description";
     public static final String STATUS = "status";
 
-    private int id;
+    private int id = -1;
     private String title;
     private String description;
     private int status;

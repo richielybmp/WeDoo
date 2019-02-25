@@ -6,10 +6,14 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.espfullstack.wedoo.events.ToDooItemActionEvent;
+import com.espfullstack.wedoo.events.ToDooItemClickedEvent;
 import com.espfullstack.wedoo.pojo.ToDooItem;
 
 import java.util.List;
 import com.espfullstack.wedoo.R;
+
+import org.greenrobot.eventbus.EventBus;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,9 +23,24 @@ import butterknife.ButterKnife;
 public class ToDooItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<ToDooItem> toDooItems;
 
-
     public ToDooItemAdapter(List<ToDooItem> toDooItems) {
         this.toDooItems = toDooItems;
+    }
+
+    public void add(ToDooItem toDooItem) {
+        toDooItems.add(toDooItem);
+        notifyItemInserted(toDooItems.size() - 1);
+    }
+
+    public void delete(int position) {
+        ToDooItem item = toDooItems.remove(position);
+        notifyItemRemoved(position);
+        EventBus.getDefault().post(new ToDooItemActionEvent(item, ToDooItemActionEvent.ToDooItemAction.DELETED));
+    }
+
+    public void update(ToDooItem toDooItem, int position) {
+        toDooItems.set(position, toDooItem);
+        notifyItemChanged(position);
     }
 
     @NonNull
@@ -55,24 +74,26 @@ public class ToDooItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     }
 
 
+
+
     class TodooItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         @BindView(R.id.tvToDoItemTitle)
         TextView txtTitle;
         @BindView(R.id.tvToDoItemDescription)
         TextView txtDescription;
-        View todoItemView;
 
         TodooItemViewHolder(@NonNull View itemView){
             super(itemView);
-            todoItemView = itemView;
-            todoItemView.setOnClickListener(this);
             ButterKnife.bind(this, itemView);
+            itemView.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
-            Toast.makeText(v.getContext(), "CLICKADO", Toast.LENGTH_SHORT).show();
+            int position = getAdapterPosition();
+            ToDooItem todooItem = toDooItems.get(position);
+            EventBus.getDefault().post(new ToDooItemClickedEvent(todooItem, position));
         }
 
         void bind(ToDooItem toDooItem){

@@ -14,7 +14,7 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
-            android:name=".session.FormToDoItemActivity"
+            android:name=".FormToDooItemActivity"
             android:theme="@style/AppTheme.NoActionBarForm">
 
         </activity>

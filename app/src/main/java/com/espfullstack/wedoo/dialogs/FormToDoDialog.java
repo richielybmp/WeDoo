@@ -202,7 +202,7 @@ public class FormToDoDialog extends DialogFragment {
     }
 
     private void updateToDo (View view){
-        if (toDooController.updateToDoo(toDoo)) {
+        if (toDooController.update(toDoo)) {
             Toast.makeText(view.getContext(), "Atualizado com sucesso", Toast.LENGTH_SHORT).show();
             mCallback.onToDooUpdated(toDoo, position);
         }else {
@@ -211,7 +211,7 @@ public class FormToDoDialog extends DialogFragment {
     }
 
     private void newTodo (View view){
-        if (toDooController.addToDoo(toDoo)) {
+        if (toDooController.add(toDoo)) {
             Toast.makeText(view.getContext(), "Salvo com sucesso", Toast.LENGTH_SHORT).show();
             mCallback.onToDooInserted(toDoo);
         } else {

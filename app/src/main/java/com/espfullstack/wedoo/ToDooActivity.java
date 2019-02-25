@@ -1,13 +1,14 @@
 package com.espfullstack.wedoo;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -18,15 +19,16 @@ import android.view.View;
 
 import com.espfullstack.wedoo.adapters.ToDooItemAdapter;
 import com.espfullstack.wedoo.controllers.ToDooItemController;
+import com.espfullstack.wedoo.events.ToDooHasChangedEvent;
+import com.espfullstack.wedoo.events.ToDooItemClickedEvent;
+import com.espfullstack.wedoo.events.ToDooItemActionEvent;
 import com.espfullstack.wedoo.helper.RecyclerViewDataObserver;
+import com.espfullstack.wedoo.helper.ToDooItemSwipeCallback;
 import com.espfullstack.wedoo.pojo.ToDoo;
 import com.espfullstack.wedoo.pojo.ToDooItem;
-import com.espfullstack.wedoo.session.FormToDoItemActivity;
 
 import org.greenrobot.eventbus.EventBus;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.greenrobot.eventbus.Subscribe;
 
 public class ToDooActivity extends AppCompatActivity {
 
@@ -42,9 +44,11 @@ public class ToDooActivity extends AppCompatActivity {
 
     private ToDooItemController toDooItemController;
     private ToDooItemAdapter toDooItemAdapter;
-
-    private List<ToDooItem> toDooItems;
     RecyclerViewDataObserver dataObserver;
+
+    private int clickedPosition = -1;
+    private boolean hasChanged = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,11 +63,7 @@ public class ToDooActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(toDoo.getTitle());
 
         toDooItemController = new ToDooItemController(this);
-
-        toDooItems = toDooItemController.getAll(toDoo.getId());
-        // TODO: atribuir os TodooItems na a List<ToDooItem> do ToDoo
-
-        toDooItemAdapter = new ToDooItemAdapter(toDooItems);
+        toDooItemAdapter = new ToDooItemAdapter(toDoo.getToDooItemList());
 
         rvToDooItem.setAdapter(toDooItemAdapter);
 
@@ -72,6 +72,9 @@ public class ToDooActivity extends AppCompatActivity {
         toDooItemAdapter.registerAdapterDataObserver(dataObserver);
         rvToDooItem.setLayoutManager(new LinearLayoutManager(this));
         rvToDooItem.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ToDooItemSwipeCallback(toDooItemAdapter, this));
+        itemTouchHelper.attachToRecyclerView(rvToDooItem);
     }
 
     @Override
@@ -84,24 +87,68 @@ public class ToDooActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
         switch (item.getItemId()){
-            //TODO Adicionar eventBus
+            case android.R.id.home:
+                onBackPressed();
+                break;
             case R.id.btn_add_toolbar:
-                Intent i = new Intent(this, FormToDoItemActivity.class);
-                i.putExtra("todoo", toDoo);
-                startActivity(i);
-                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                startToDooItemActivity(null);
             break;
         }
-
         return true;
+    }
 
+    public void startToDooItemActivity(@Nullable ToDooItem toDooItem) {
+        Intent i = new Intent(this, FormToDooItemActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putInt("todoo", toDoo.getId());
+        bundle.putSerializable("todoo_item", toDooItem);
+        i.putExtras(bundle);
+        startActivity(i);
+        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
     }
 
     @Override
-    public boolean onSupportNavigateUp() {
-        onBackPressed();
-        return true;
+    public void onBackPressed() {
+        if(hasChanged) {
+            EventBus.getDefault().postSticky(new ToDooHasChangedEvent(toDoo));
+        }
+        super.onBackPressed();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Subscribe
+    public void onToDooItemClickEvent(ToDooItemClickedEvent event) {
+        clickedPosition = event.getPosition();
+        startToDooItemActivity(event.getToDooItem());
+    }
+
+    @Subscribe(sticky = true)
+    public void onToDooItemActionEvent(ToDooItemActionEvent event) {
+        EventBus.getDefault().removeStickyEvent(event);
+        ToDooItem toDooItem = event.getToDooItem();
+        hasChanged = true;
+        switch (event.getAction()) {
+            case SAVED:
+                toDooItemAdapter.add(toDooItem);
+                break;
+            case UPDATED:
+                toDooItemAdapter.update(toDooItem, clickedPosition);
+                break;
+            case DELETED:
+                toDooItemController.delete(toDooItem.getId());
+                break;
+        }
     }
 }

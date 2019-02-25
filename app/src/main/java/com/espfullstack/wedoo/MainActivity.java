@@ -7,10 +7,10 @@ import com.espfullstack.wedoo.Interface.IToDooAction;
 import com.espfullstack.wedoo.adapters.ToDooAdapter;
 import com.espfullstack.wedoo.controllers.ToDooController;
 import com.espfullstack.wedoo.dialogs.FormToDoDialog;
-import com.espfullstack.wedoo.events.ToDooItemClickedEvent;
-import com.espfullstack.wedoo.helper.RecyclerItemTouchHelper;
+import com.espfullstack.wedoo.events.ToDooClickedEvent;
+import com.espfullstack.wedoo.events.ToDooHasChangedEvent;
 import com.espfullstack.wedoo.helper.RecyclerViewDataObserver;
-import com.espfullstack.wedoo.helper.SwipeCallback;
+import com.espfullstack.wedoo.helper.ToDooSwipeCallback;
 import com.espfullstack.wedoo.pojo.ToDoo;
 import com.espfullstack.wedoo.session.SessionMannager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -57,6 +57,8 @@ public class MainActivity extends AppCompatActivity implements IToDooAction {
 
     RecyclerViewDataObserver dataObserver;
 
+    private int clickedPosition = -1;
+
     RecyclerView.OnScrollListener onScrollListener = new RecyclerView.OnScrollListener() {
         @Override
         public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
@@ -82,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements IToDooAction {
         getSupportActionBar().setTitle(R.string.app_name);
 
         toDooController = new ToDooController(this);
-        checkFlaggedToDelete();
+        checkFlaggedForDelete();
         List<ToDoo> toDoos = toDooController.getAll();
 
         toDooAdapter = new ToDooAdapter(toDoos, this);
@@ -94,11 +96,11 @@ public class MainActivity extends AppCompatActivity implements IToDooAction {
         toDooAdapter.registerAdapterDataObserver(dataObserver);
 
         rvToDo.addOnScrollListener(onScrollListener);
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new SwipeCallback(toDooAdapter, this));
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ToDooSwipeCallback(toDooAdapter, this));
         itemTouchHelper.attachToRecyclerView(rvToDo);
     }
 
-    private void checkFlaggedToDelete() {
+    private void checkFlaggedForDelete() {
         int flaggedId = SessionMannager.getFlagged(this);
         if (flaggedId != 0) {
             deleteAndRemoveFlag(flaggedId);
@@ -147,8 +149,15 @@ public class MainActivity extends AppCompatActivity implements IToDooAction {
     }
 
     @Subscribe
-    public void onToDooItemClickedEvent(ToDooItemClickedEvent itemClickedEvent) {
+    public void onToDooItemClickedEvent(ToDooClickedEvent itemClickedEvent) {
+        clickedPosition = itemClickedEvent.getPosition();
         startActivityToDoo(itemClickedEvent.getToDoo());
+    }
+
+    @Subscribe(sticky = true)
+    public void onToDooHasChangedEvent(ToDooHasChangedEvent event) {
+        EventBus.getDefault().removeStickyEvent(event);
+        toDooAdapter.update(event.getToDoo(), clickedPosition);
     }
 
     @OnClick(R.id.fab)
@@ -167,12 +176,12 @@ public class MainActivity extends AppCompatActivity implements IToDooAction {
 
     @Override
     public void onToDooInserted(ToDoo toDoo) {
-        toDooAdapter.addToDoo(toDoo);
+        toDooAdapter.add(toDoo);
     }
 
     @Override
     public void onToDooUpdated(ToDoo toDoo, int position) {
-        toDooAdapter.updateToDoo(toDoo, position);
+        toDooAdapter.update(toDoo, position);
     }
 
     @Override

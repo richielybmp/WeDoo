@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import com.espfullstack.wedoo.adapters.ToDooAdapter;
 import com.espfullstack.wedoo.helper.DatabaseHelper;
 import com.espfullstack.wedoo.pojo.ToDoo;
+import com.espfullstack.wedoo.pojo.ToDooItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +20,7 @@ public class ToDooController {
         databaseHelper = DatabaseHelper.getInstance(context);
     }
 
-    public boolean addToDoo(ToDoo toDoo) {
+    public boolean add(ToDoo toDoo) {
         ContentValues values = new ContentValues();
         SQLiteDatabase database = databaseHelper.getDatabase();
         database.beginTransaction();
@@ -37,7 +38,7 @@ public class ToDooController {
             database.endTransaction();
         }
 
-        if(resultado > 0) {
+        if(resultado > -1) {
             toDoo.setId((int) resultado);
             return true;
         }
@@ -45,7 +46,7 @@ public class ToDooController {
         return false;
     }
 
-    public boolean updateToDoo(ToDoo toDoo) {
+    public boolean update(ToDoo toDoo) {
         ContentValues values = new ContentValues();
         SQLiteDatabase database = databaseHelper.getDatabase();
         database.beginTransaction();
@@ -90,7 +91,8 @@ public class ToDooController {
 
     public List<ToDoo> getAll() {
         List<ToDoo> todoList = new ArrayList<>();
-        Cursor c = databaseHelper.getDatabase().query(ToDoo.TABLE, null, null,
+        SQLiteDatabase database = databaseHelper.getDatabase();
+        Cursor c = database.query(ToDoo.TABLE, null, null,
                 null, null, null, null);
 
         if (c.moveToFirst()) {
@@ -101,6 +103,23 @@ public class ToDooController {
                 toDoo.setDescription(c.getString(c.getColumnIndex(ToDoo.DESCRIPTION)));
                 toDoo.setType(c.getInt(c.getColumnIndex(ToDoo.TYPE)));
                 toDoo.setEndDate(c.getString(c.getColumnIndex(ToDoo.END_DATE)));
+
+                List<ToDooItem> toDooItems = new ArrayList<>();
+                Cursor cItem = database.query(ToDooItem.TABLE, null, ToDooItem.FK + " = ?",
+                        new String[] { String.valueOf(toDoo.getId()) }, null, null, null);
+
+                if (cItem.moveToFirst()) {
+                    do {
+                        ToDooItem toDooItem = new ToDooItem();
+                        toDooItem.setId(cItem.getInt(cItem.getColumnIndex(ToDooItem.ID)));
+                        toDooItem.setTitle(cItem.getString(cItem.getColumnIndex(ToDooItem.TITLE)));
+                        toDooItem.setDescription(cItem.getString(cItem.getColumnIndex(ToDooItem.DESCRIPTION)));
+                        toDooItem.setStatus(cItem.getInt(cItem.getColumnIndex(ToDooItem.STATUS)));
+                        toDooItems.add(toDooItem);
+                    } while (cItem.moveToNext());
+                }
+                cItem.close();
+                toDoo.setToDooItemList(toDooItems);
                 todoList.add(toDoo);
             } while (c.moveToNext());
         }
@@ -121,11 +140,11 @@ public class ToDooController {
         return result > 0;
     }
 
-    public boolean saveToDoo(ToDoo toDoo) {
+    public boolean save(ToDoo toDoo) {
         if(toDoo.getId() > -1) {
-            return updateToDoo(toDoo);
+            return update(toDoo);
         } else {
-            return addToDoo(toDoo);
+            return add(toDoo);
         }
     }
 }

@@ -11,18 +11,17 @@ import com.espfullstack.wedoo.R;
 import com.espfullstack.wedoo.adapters.ToDooAdapter;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class SwipeCallback extends ItemTouchHelper.SimpleCallback {
+public class ToDooSwipeCallback extends ItemTouchHelper.SimpleCallback {
 
     private ToDooAdapter toDooAdapter;
 
     private Drawable deleteIcon, editIcon;
     private final ColorDrawable deleteBackground, editBackground;
 
-    public SwipeCallback(ToDooAdapter toDooAdapter, Context context) {
+    public ToDooSwipeCallback(ToDooAdapter toDooAdapter, Context context) {
         super(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT);
         this.toDooAdapter = toDooAdapter;
         deleteIcon = context.getDrawable(R.drawable.ic_trash);
@@ -33,39 +32,19 @@ public class SwipeCallback extends ItemTouchHelper.SimpleCallback {
 
     @Override
     public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-        int from = viewHolder.getAdapterPosition();
-        int to = target.getAdapterPosition();
-        toDooAdapter.onMove(from, to);
-        return true;
+        return false;
     }
 
     @Override
     public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
         int position = viewHolder.getAdapterPosition();
         if(direction == ItemTouchHelper.LEFT) {
-            toDooAdapter.deleteItem(position);
+            toDooAdapter.delete(position);
         } else if(direction == ItemTouchHelper.RIGHT){
-            toDooAdapter.editItem(position);
+            toDooAdapter.edit(position);
         }
     }
 
-
-    @Override
-    public boolean isLongPressDragEnabled() {
-        return true;
-    }
-
-    @Override
-    public boolean isItemViewSwipeEnabled() {
-        return true;
-    }
-
-    @Override
-    public int getMovementFlags(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
-        int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
-        int swipeFlags = ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT;
-        return makeMovementFlags(dragFlags, swipeFlags);
-    }
 
     @Override
     public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
@@ -74,8 +53,6 @@ public class SwipeCallback extends ItemTouchHelper.SimpleCallback {
         if (viewHolder.getAdapterPosition() == -1) {
             return;
         }
-
-        float margin = AndroidUtils.convertDpToPixel(8, recyclerView.getContext());
 
         ColorDrawable background = deleteBackground;
         Drawable icon = deleteIcon;
@@ -89,7 +66,7 @@ public class SwipeCallback extends ItemTouchHelper.SimpleCallback {
             icon = editIcon;
             int iconLeft = itemView.getLeft() + iconMargin;
             int iconRight = iconLeft + icon.getIntrinsicWidth();
-            background.setBounds(itemView.getLeft(), itemView.getTop() + (int) margin, itemView.getLeft() + ((int) dX), itemView.getBottom());
+            background.setBounds(itemView.getLeft(), itemView.getTop(), itemView.getLeft() + ((int) dX), itemView.getBottom());
             icon.setBounds(iconLeft, iconTop, iconRight, iconBottom);
 
         } else if (dX < 0){
@@ -97,7 +74,7 @@ public class SwipeCallback extends ItemTouchHelper.SimpleCallback {
             icon = deleteIcon;
             int iconLeft = itemView.getRight() - iconMargin - icon.getIntrinsicWidth();
             int iconRight = itemView.getRight() - iconMargin;
-            background.setBounds(itemView.getRight() + ((int) dX), itemView.getTop() + (int) margin, itemView.getRight(), itemView.getBottom());
+            background.setBounds(itemView.getRight() + ((int) dX), itemView.getTop(), itemView.getRight(), itemView.getBottom());
             icon.setBounds(iconLeft, iconTop, iconRight, iconBottom);
         } else {
             background.setBounds(0, 0,0,0);
