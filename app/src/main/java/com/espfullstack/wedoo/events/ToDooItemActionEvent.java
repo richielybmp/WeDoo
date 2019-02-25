@@ -2,14 +2,25 @@ package com.espfullstack.wedoo.events;
 
 import com.espfullstack.wedoo.pojo.ToDooItem;
 
-public class ToDooItemSavedEvent {
+public class ToDooItemActionEvent {
+    public enum ToDooItemAction {
+        SAVED,
+        UPDATED,
+        DELETED
+    }
     private ToDooItem toDooItem;
+    private ToDooItemAction action;
 
-    public ToDooItemSavedEvent(ToDooItem toDooItem) {
+    public ToDooItemActionEvent(ToDooItem toDooItem, ToDooItemAction action) {
         this.toDooItem = toDooItem;
+        this.action = action;
     }
 
     public ToDooItem getToDooItem() {
         return toDooItem;
+    }
+
+    public ToDooItemAction getAction() {
+        return action;
     }
 }
