@@ -65,25 +65,28 @@ public class ToDooSwipeCallback extends ItemTouchHelper.SimpleCallback {
         adDelete.setMessage(context.getResources().getString(R.string.dialog_delete_really_one));
         //adDelete.setMessage(context.getResources().getString(R.string.dialog_delete_really));
 
+        final int adapterPosition = viewHolder.getAdapterPosition();
+
         adDelete.setButton(DialogInterface.BUTTON_POSITIVE, "Delete", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                toDooAdapter.delete(viewHolder.getAdapterPosition());
+                toDooAdapter.delete(adapterPosition);
             }
         });
 
         adDelete.setButton(DialogInterface.BUTTON_NEGATIVE, "No", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                toDooAdapter.notifyItemChanged(viewHolder.getAdapterPosition());
+                //toDooAdapter.notifyItemChanged(adapterPosition);
             }
         });
 
         adDelete.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
-                toDooAdapter.notifyItemChanged(viewHolder.getAdapterPosition());
+                //toDooAdapter.notifyItemChanged(adapterPosition);
             }
         });
         adDelete.show();
+        toDooAdapter.notifyItemChanged(adapterPosition);
     }
 
 

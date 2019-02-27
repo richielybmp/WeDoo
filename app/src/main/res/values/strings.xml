@@ -67,6 +67,8 @@
     <string name="dialog_delete_Title">Delete ToDoo</string>
     <string name="dialog_delete_really_one">Are you sure?</string>
     <string name="dialog_delete_really">Not all itens are done. Delete ToDoo anyway?</string>
+    <string name="search">Search</string>
+    <string name="about">About</string>
 
 </resources>
 

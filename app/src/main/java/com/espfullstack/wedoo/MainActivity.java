@@ -1,5 +1,7 @@
 package com.espfullstack.wedoo;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -18,6 +20,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -26,10 +29,13 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import org.greenrobot.eventbus.EventBus;
@@ -84,7 +90,6 @@ public class MainActivity extends AppCompatActivity implements IToDooAction {
         getSupportActionBar().setTitle(R.string.app_name);
 
         toDooController = new ToDooController(this);
-        checkFlaggedForDelete();
         List<ToDoo> toDoos = toDooController.getAll();
 
         toDooAdapter = new ToDooAdapter(toDoos, this);
@@ -100,25 +105,42 @@ public class MainActivity extends AppCompatActivity implements IToDooAction {
         itemTouchHelper.attachToRecyclerView(rvToDo);
     }
 
-    private void checkFlaggedForDelete() {
-        int flaggedId = SessionMannager.getFlagged(this);
-        if (flaggedId != 0) {
-            deleteAndRemoveFlag(flaggedId);
-        }
-    }
-
-    private void deleteAndRemoveFlag(int flaggedId) {
-        if(toDooController.delete(flaggedId))
-            SessionMannager.removeFlagged(this);
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.tab_menu, menu);
 
-        // return true so that the menu pop up is opened
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) menu.findItem(R.id.action_search)
+                .getActionView();
+        searchView.setSearchableInfo(searchManager
+                .getSearchableInfo(getComponentName()));
+
+        EditText edt = searchView.findViewById(R.id.search_src_text);
+
+        edt.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before,
+                                      int count) {
+                toDooAdapter.filter(s.toString());
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count,
+                                          int after) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // TODO Auto-generated method stub
+
+            }
+        });
+
+        super.onCreateOptionsMenu(menu);
         return true;
     }
 
@@ -186,7 +208,7 @@ public class MainActivity extends AppCompatActivity implements IToDooAction {
 
     @Override
     public void onToDooDeleted(ToDoo toDoo) {
-        deleteAndRemoveFlag(toDoo.getId());
+        toDooController.delete(toDoo.getId());
     }
 }
 

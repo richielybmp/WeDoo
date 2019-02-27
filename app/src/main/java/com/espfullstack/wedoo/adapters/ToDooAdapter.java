@@ -8,6 +8,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.TextUtils;
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,26 +27,29 @@ import com.google.android.material.snackbar.Snackbar;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 public class ToDooAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private List<ToDoo> toDooList;
-    private Random random = new Random();
-    private float h;
+    private List<ToDoo> filteredList;
 
-    private ToDoo deletedToDoo;
-    private int deletedToDooPosition;
+    //private Random random = new Random();
+    //private float h;
 
     private AppCompatActivity activity;
-    private IToDooAction toDooAction;
+    private String query;
+
+    private IToDooAction action;
 
     public ToDooAdapter(List<ToDoo> toDooList, AppCompatActivity activity) {
         this.toDooList = toDooList;
-        h = random.nextFloat();
+        filteredList = new ArrayList<>(toDooList);
+        //h = random.nextFloat();
         this.activity = activity;
-        toDooAction = (IToDooAction) activity;
+        action = (IToDooAction) activity;
     }
 
     @NonNull
@@ -62,7 +68,7 @@ public class ToDooAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        final ToDoo toDoo = toDooList.get(position);
+        final ToDoo toDoo = filteredList.get(position);
         int viewType = holder.getItemViewType();
         switch (viewType) {
             case ToDoo.TAREFA:
@@ -75,33 +81,32 @@ public class ToDooAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     @Override
     public int getItemViewType(int position) {
         //Se quiser diferenciar as views para cada tipo de ToDoo
-        ToDoo todo = toDooList.get(position);
+        ToDoo todo = filteredList.get(position);
         return todo.getType();
     }
 
     @Override
     public int getItemCount() {
-        return toDooList.size();
+        return filteredList.size();
     }
 
     public void add(ToDoo todoo) {
         toDooList.add(todoo);
-        notifyItemInserted(toDooList.size() - 1);
+        filteredList.add(todoo);
+        notifyItemInserted(filteredList.size() - 1);
     }
 
     public void update(ToDoo toDoo, int position) {
         toDooList.set(position, toDoo);
-        notifyItemChanged(position);
-    }
+        filteredList.set(position, toDoo);
 
-    public ToDoo getSelectedToDoo(int position) {
-        return toDooList.get(position);
+        notifyItemChanged(position);
     }
 
     public void edit(int position) {
         FormToDoDialog formToDoDialog = new FormToDoDialog();
         Bundle toDoData = new Bundle();
-        toDoData.putSerializable("toDoData", toDooList.get(position));
+        toDoData.putSerializable("toDoData", filteredList.get(position));
         toDoData.putInt("position", position);
         formToDoDialog.setArguments(toDoData);
         formToDoDialog.show(activity.getSupportFragmentManager(), "dialog_edit_todo");
@@ -109,35 +114,26 @@ public class ToDooAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
     public void delete(int position) {
-        deletedToDoo = toDooList.get(position);
-        deletedToDooPosition = position;
-        toDooList.remove(position);
+        ToDoo deletedToDoo = filteredList.get(position);
+        toDooList.remove(deletedToDoo);
+        filteredList.remove(position);
         notifyItemRemoved(position);
-        SessionMannager.flagForDelete(activity, deletedToDoo.getId());
-        showUndoSnackbar();
+        action.onToDooDeleted(deletedToDoo);
     }
 
-    private void showUndoSnackbar() {
-        View view = activity.findViewById(R.id.clMainActivity);
-        Snackbar snackbar = Snackbar.make(view, R.string.todoo_deleted,
-                Snackbar.LENGTH_LONG);
-        snackbar.setAction(R.string.snack_bar_undo, v -> undoDelete())
-                .addCallback(new Snackbar.Callback() {
-            @Override
-            public void onDismissed(Snackbar transientBottomBar, int event) {
-                super.onDismissed(transientBottomBar, event);
-                if(Snackbar.Callback.DISMISS_EVENT_ACTION != event) {
-                    toDooAction.onToDooDeleted(deletedToDoo);
+    public void filter(String query) {
+        this.query = query;
+        filteredList.clear();
+        if (!TextUtils.isEmpty(query)) {
+            for (ToDoo toDoo : toDooList) {
+                if (toDoo.getTitle().toLowerCase().contains(query.toLowerCase())) {
+                    filteredList.add(toDoo);
                 }
             }
-        });
-        snackbar.show();
-    }
-
-    private void undoDelete() {
-        SessionMannager.removeFlagged(activity);
-        toDooList.add(deletedToDooPosition, deletedToDoo);
-        notifyItemInserted(deletedToDooPosition);
+        } else {
+            filteredList.addAll(toDooList);
+        }
+        notifyDataSetChanged();
     }
 
     public class ToDoViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
@@ -154,13 +150,20 @@ public class ToDooAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             super(itemView);
             ButterKnife.bind(this, itemView);
             itemView.setOnClickListener(this);
+            //h += ColorUtil.GOLDEN_RATIO;
+            //int color = ColorUtil.generateColor(h);
+            //cvToDoo.setBackgroundColor(color);
         }
 
         void bind(ToDoo toDoo) {
-            h += ColorUtil.GOLDEN_RATIO;
-            int color = ColorUtil.generateColor(h);
-            cvToDoo.setBackgroundColor(color);
-            tvTitle.setText(toDoo.getTitle());
+            tvTitle.setText(toDoo.getTitle(), TextView.BufferType.SPANNABLE);
+            if (!TextUtils.isEmpty(query)) {
+                Spannable span = (Spannable) tvTitle.getText();
+                int start = span.toString().toLowerCase().indexOf(query.toLowerCase().charAt(0));
+                int end = start + query.length();
+                span.setSpan(new ForegroundColorSpan(0xFFFFC107), start, end,
+                        Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+            }
             int count = toDoo.getToDooItemList().size();
             tvToDooItemCount.setText(activity.getResources().getQuantityString(R.plurals.items, count, count));
         }

@@ -16,6 +16,13 @@ public class RecyclerViewDataObserver extends RecyclerView.AdapterDataObserver {
     }
 
     @Override
+    public void onChanged() {
+        Log.d("ONCHANGED", "CHANGED");
+        checkIfEmpty();
+        super.onChanged();
+    }
+
+    @Override
     public void onItemRangeInserted(int positionStart, int itemCount) {
         Log.d("ONINSERTED", "INSERTED");
         checkIfEmpty();
