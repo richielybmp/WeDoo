@@ -144,10 +144,14 @@ public class ToDooActivity extends AppCompatActivity {
                 toDooItemAdapter.add(toDooItem);
                 break;
             case UPDATED:
+                toDooItemAdapter.update(toDooItem, clickedPosition);
+                break;
+            case STATUS_UPDATED:
+                // NAO É PRA ESSA ATUALIZAÇÃO SER FEITA AQUI, PORÉM NÃO IDENTIFIQUEI OUTRA FORMA =(
                 toDooItemController.update(toDooItem);
                 break;
             case DELETED:
-                toDooItemController.delete(toDooItem.getId());
+                toDooItemAdapter.delete(clickedPosition);
                 break;
         }
     }

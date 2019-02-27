@@ -7,8 +7,10 @@ import butterknife.OnClick;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.espfullstack.wedoo.controllers.ToDooItemController;
 import com.espfullstack.wedoo.events.ToDooItemActionEvent;
@@ -81,11 +83,31 @@ public class FormToDooItemActivity extends AppCompatActivity {
 
     private boolean save() {
         if(isUpdate) {
-            toDooItemAction = ToDooItemActionEvent.ToDooItemAction.UPDATED;
-            return toDooItemController.update(toDooItem);
+            return updateToDooItem();
         } else {
+            return saveToDooItem();
+        }
+    }
+
+    private Boolean updateToDooItem(){
+        if (toDooItemController.update(toDooItem)) {
+            Toast.makeText(getApplicationContext(), "Atualizado com sucesso", Toast.LENGTH_SHORT).show();
+            toDooItemAction = ToDooItemActionEvent.ToDooItemAction.UPDATED;
+            return true;
+        }else {
+            Toast.makeText(getApplicationContext(), "Erro ao atualizar ToDooItem", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+    }
+
+    private Boolean saveToDooItem(){
+        if (toDooItemController.add(toDooId, toDooItem)) {
+            Toast.makeText(getApplicationContext(), "Salvo com sucesso", Toast.LENGTH_SHORT).show();
             toDooItemAction = ToDooItemActionEvent.ToDooItemAction.SAVED;
-            return toDooItemController.add(toDooId, toDooItem);
+            return true;
+        }else {
+            Toast.makeText(getApplicationContext(), "Erro ao atualizar ToDooItem", Toast.LENGTH_SHORT).show();
+            return false;
         }
     }
 
