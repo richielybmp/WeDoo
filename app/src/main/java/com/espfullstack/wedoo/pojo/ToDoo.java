@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.Nullable;
+
 public class ToDoo implements Serializable {
     public static final String TABLE = "todoos";
     public static final String ID = "id";
@@ -92,5 +94,11 @@ public class ToDoo implements Serializable {
     }
     public String getConvertedType(){
         return this.type == TAREFA ? "Tasks" : "Shops";
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if(obj == null) return false;
+        return this.id == ((ToDoo) obj).getId();
     }
 }

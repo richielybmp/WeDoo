@@ -97,9 +97,9 @@ public class ToDooAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
     public void update(ToDoo toDoo, int position) {
-        toDooList.set(position, toDoo);
+        //toDooList.set(position, toDoo);
         filteredList.set(position, toDoo);
-
+        toDooList.set(toDooList.indexOf(toDoo), toDoo);
         notifyItemChanged(position);
     }
 

@@ -80,6 +80,8 @@ public class ToDooItemSwipeCallback extends ItemTouchHelper.SimpleCallback {
             background.setBounds(itemView.getLeft(), itemView.getTop(), itemView.getLeft() + ((int) dX), itemView.getBottom());
 
         } else if (dX < 0){
+            background = this.background;
+            icone = this.icon;
             int iconLeft = itemView.getRight() - iconMargin - icone.getIntrinsicWidth();
             int iconRight = itemView.getRight() - iconMargin;
             background.setBounds(itemView.getRight() + ((int) dX), itemView.getTop(), itemView.getRight(), itemView.getBottom());
