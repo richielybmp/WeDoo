@@ -144,7 +144,7 @@ public class ToDooActivity extends AppCompatActivity {
                 toDooItemAdapter.add(toDooItem);
                 break;
             case UPDATED:
-                toDooItemAdapter.update(toDooItem, clickedPosition);
+                toDooItemController.update(toDooItem);
                 break;
             case DELETED:
                 toDooItemController.delete(toDooItem.getId());

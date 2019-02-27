@@ -55,7 +55,6 @@
     <string name="snack_bar_undo">Undo</string>
     <string name="todoo_deleted">ToDoo deleted!</string>
 
-
     <plurals name="items">
         <item quantity="one">%d item</item>
         <item quantity="other">%d items </item>
@@ -64,6 +63,10 @@
     <!--FormToDo Item Activity-->
     <string name="title_activity">New Task</string>
     <string name="required">Required</string>
+
+    <string name="dialog_delete_Title">Delete ToDoo</string>
+    <string name="dialog_delete_really_one">Are you sure?</string>
+    <string name="dialog_delete_really">Not all itens are done. Delete ToDoo anyway?</string>
 
 </resources>
 

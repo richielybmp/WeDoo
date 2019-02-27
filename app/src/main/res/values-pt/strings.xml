@@ -55,4 +55,8 @@
         <item quantity="one">%d item</item>
         <item quantity="other">%d itens </item>
     </plurals>
+
+    <string name="dialog_delete_Title">Excluir ToDoo</string>
+    <string name="dialog_delete_really_one">Deseja realmente excluir esse ToDoo?</string>
+    <string name="dialog_delete_really">Nem todos os itens desse ToDoo foram finalizados. Excluir mesmo assim?</string>
 </resources>

@@ -1,5 +1,6 @@
 package com.espfullstack.wedoo.adapters;
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,6 +42,11 @@ public class ToDooItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     public void update(ToDooItem toDooItem, int position) {
         toDooItems.set(position, toDooItem);
         notifyItemChanged(position);
+        EventBus.getDefault().post(new ToDooItemActionEvent(toDooItem, ToDooItemActionEvent.ToDooItemAction.UPDATED));
+    }
+
+    public ToDooItem getSelectedToDooItem(int position) {
+        return toDooItems.get(position);
     }
 
     @NonNull
@@ -53,7 +59,6 @@ public class ToDooItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             default:
                 return new TodooItemViewHolder(view);
         }
-
     }
 
     @Override
@@ -73,15 +78,14 @@ public class ToDooItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         return toDooItems.size();
     }
 
-
-
-
     class TodooItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         @BindView(R.id.tvToDoItemTitle)
         TextView txtTitle;
         @BindView(R.id.tvToDoItemDescription)
         TextView txtDescription;
+        @BindView(R.id.rlToDooItemLayoutBackground)
+        View viewBackground;
 
         TodooItemViewHolder(@NonNull View itemView){
             super(itemView);
@@ -99,8 +103,8 @@ public class ToDooItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         void bind(ToDooItem toDooItem){
             txtTitle.setText(toDooItem.getTitle());
             txtDescription.setText(toDooItem.getDescription());
+            viewBackground.setBackgroundColor(toDooItem.getStatus() == 0 ? Color.RED : Color.GREEN);
+            // TODO: ADICIONAR A DATA EM QUE O ITEM FOI CONCLUIDO.
         }
-
     }
-
 }

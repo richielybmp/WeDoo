@@ -10,6 +10,7 @@ import android.view.View;
 import com.espfullstack.wedoo.R;
 import com.espfullstack.wedoo.adapters.ToDooItemAdapter;
 import com.espfullstack.wedoo.events.ToDooItemActionEvent;
+import com.espfullstack.wedoo.pojo.ToDooItem;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -21,15 +22,15 @@ public class ToDooItemSwipeCallback extends ItemTouchHelper.SimpleCallback {
 
     private ToDooItemAdapter toDooItemAdapter;
     private Drawable icon;
-    private final ColorDrawable background;
+    private final ColorDrawable background, finishedBackground;
 
     public ToDooItemSwipeCallback(ToDooItemAdapter toDooItemAdapter, Context context) {
-        super(0, ItemTouchHelper.LEFT);
+        super(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT);
         this.toDooItemAdapter = toDooItemAdapter;
         icon = context.getDrawable(R.drawable.ic_trash);
         background = new ColorDrawable(Color.RED);
+        finishedBackground = new ColorDrawable(Color.RED);
     }
-
 
     @Override
     public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
@@ -39,7 +40,22 @@ public class ToDooItemSwipeCallback extends ItemTouchHelper.SimpleCallback {
     @Override
     public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
         int position = viewHolder.getAdapterPosition();
-        toDooItemAdapter.delete(position);
+
+        if(direction == ItemTouchHelper.LEFT) {
+            toDooItemAdapter.delete(position);
+        } else if(direction == ItemTouchHelper.RIGHT) {
+            ToDooItem item = toDooItemAdapter.getSelectedToDooItem(position);
+
+            if (item.getStatus() == 0){
+                item.setStatus(1);
+                finishedBackground.setColor(Color.RED);
+            }
+            else if (item.getStatus() == 1){
+                item.setStatus(0);
+                finishedBackground.setColor(Color.GREEN);
+            }
+            toDooItemAdapter.update(item, position);
+        }
     }
 
     @Override
@@ -50,15 +66,24 @@ public class ToDooItemSwipeCallback extends ItemTouchHelper.SimpleCallback {
             return;
         }
 
-        int iconMargin = (itemView.getHeight() - icon.getIntrinsicHeight()) / 2;
-        int iconTop = itemView.getTop() + (itemView.getHeight() - icon.getIntrinsicHeight()) / 2;
-        int iconBottom = iconTop + icon.getIntrinsicHeight();
+        ColorDrawable background = finishedBackground;
 
-        if (dX < 0){
-            int iconLeft = itemView.getRight() - iconMargin - icon.getIntrinsicWidth();
+        Drawable icone = icon;
+
+        int iconMargin = (itemView.getHeight() - icone.getIntrinsicHeight()) / 2;
+        int iconTop = itemView.getTop() + (itemView.getHeight() - icone.getIntrinsicHeight()) / 2;
+        int iconBottom = iconTop + icone.getIntrinsicHeight();
+
+        if(dX > 0) {
+            background = finishedBackground;
+            icone = null;
+            background.setBounds(itemView.getLeft(), itemView.getTop(), itemView.getLeft() + ((int) dX), itemView.getBottom());
+
+        } else if (dX < 0){
+            int iconLeft = itemView.getRight() - iconMargin - icone.getIntrinsicWidth();
             int iconRight = itemView.getRight() - iconMargin;
             background.setBounds(itemView.getRight() + ((int) dX), itemView.getTop(), itemView.getRight(), itemView.getBottom());
-            icon.setBounds(iconLeft, iconTop, iconRight, iconBottom);
+            icone.setBounds(iconLeft, iconTop, iconRight, iconBottom);
         } else {
             background.setBounds(0, 0,0,0);
         }
@@ -66,6 +91,6 @@ public class ToDooItemSwipeCallback extends ItemTouchHelper.SimpleCallback {
         background.draw(c);
         icon.draw(c);
 
-        super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+        super.onChildDraw(c, recyclerView, viewHolder, dX/4, dY, actionState, isCurrentlyActive);
     }
 }

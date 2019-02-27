@@ -1,16 +1,25 @@
 package com.espfullstack.wedoo.helper;
 
+import android.app.AlertDialog;
+import android.content.ClipData;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.view.View;
 
 import com.espfullstack.wedoo.R;
 import com.espfullstack.wedoo.adapters.ToDooAdapter;
+import com.espfullstack.wedoo.pojo.ToDooItem;
+
+import java.util.Arrays;
+import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -35,14 +44,46 @@ public class ToDooSwipeCallback extends ItemTouchHelper.SimpleCallback {
         return false;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
         int position = viewHolder.getAdapterPosition();
         if(direction == ItemTouchHelper.LEFT) {
-            toDooAdapter.delete(position);
+            //List<ToDooItem> toDooItems = toDooAdapter.getSelectedToDoo(position).getToDooItemList();
+            //boolean isAllDone = toDooItems.stream().filter(o -> o.getStatus() == 0).findFirst().isPresent();
+            acaoSwipeDeletar(viewHolder);
+            //toDooAdapter.delete(position);
         } else if(direction == ItemTouchHelper.RIGHT){
             toDooAdapter.edit(position);
         }
+    }
+
+    private void acaoSwipeDeletar(@NonNull RecyclerView.ViewHolder viewHolder) {
+        Context context = viewHolder.itemView.getContext();
+        AlertDialog adDelete = new AlertDialog.Builder(context).create();
+        adDelete.setTitle(context.getResources().getString(R.string.dialog_delete_Title));
+        adDelete.setMessage(context.getResources().getString(R.string.dialog_delete_really_one));
+        //adDelete.setMessage(context.getResources().getString(R.string.dialog_delete_really));
+
+        adDelete.setButton(DialogInterface.BUTTON_POSITIVE, "Delete", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                toDooAdapter.delete(viewHolder.getAdapterPosition());
+            }
+        });
+
+        adDelete.setButton(DialogInterface.BUTTON_NEGATIVE, "No", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                toDooAdapter.notifyItemChanged(viewHolder.getAdapterPosition());
+            }
+        });
+
+        adDelete.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                toDooAdapter.notifyItemChanged(viewHolder.getAdapterPosition());
+            }
+        });
+        adDelete.show();
     }
 
 

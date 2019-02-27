@@ -94,6 +94,10 @@ public class ToDooAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         notifyItemChanged(position);
     }
 
+    public ToDoo getSelectedToDoo(int position) {
+        return toDooList.get(position);
+    }
+
     public void edit(int position) {
         FormToDoDialog formToDoDialog = new FormToDoDialog();
         Bundle toDoData = new Bundle();
@@ -136,7 +140,6 @@ public class ToDooAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         notifyItemInserted(deletedToDooPosition);
     }
 
-
     public class ToDoViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         @BindView(R.id.tvToDoTitle)
         TextView tvTitle;
@@ -160,7 +163,6 @@ public class ToDooAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             tvTitle.setText(toDoo.getTitle());
             int count = toDoo.getToDooItemList().size();
             tvToDooItemCount.setText(activity.getResources().getQuantityString(R.plurals.items, count, count));
-
         }
 
         @Override

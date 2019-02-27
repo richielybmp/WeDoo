@@ -178,10 +178,10 @@ public class FormToDoDialog extends DialogFragment {
             return false;
         }
 
-        if (TextUtils.isEmpty(_description)){
-            Toast.makeText(getContext(), R.string.err_description_dialog, Toast.LENGTH_SHORT).show();
-            return false;
-        }
+//        if (TextUtils.isEmpty(_description)){
+//            Toast.makeText(getContext(), R.string.err_description_dialog, Toast.LENGTH_SHORT).show();
+//            return false;
+//        }
 
         if (TextUtils.isEmpty(_endDate)){
             Toast.makeText(getContext(), R.string.err_endDate_dialog, Toast.LENGTH_SHORT).show();
