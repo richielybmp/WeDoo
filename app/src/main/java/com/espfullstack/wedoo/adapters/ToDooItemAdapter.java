@@ -62,6 +62,11 @@ public class ToDooItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     }
 
     @Override
+    public int getItemViewType(int position) {
+        return toDooItems.get(position).getStatus();
+    }
+
+    @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         final ToDooItem toDooItem = toDooItems.get(position);
         int viewType = holder.getItemViewType();
@@ -76,6 +81,18 @@ public class ToDooItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     @Override
     public int getItemCount() {
         return toDooItems.size();
+    }
+
+    public void changeStatus(int position) {
+        ToDooItem item = toDooItems.get(position);
+
+        if (item.getStatus() == 0){
+            item.setStatus(1);
+        }
+        else if (item.getStatus() == 1){
+            item.setStatus(0);
+        }
+        update(item, position);
     }
 
     class TodooItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
