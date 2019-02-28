@@ -9,10 +9,12 @@ public class ToDooItem implements Serializable {
     public static final String TITLE = "title";
     public static final String DESCRIPTION = "description";
     public static final String STATUS = "status";
+    public static final String IMAGE_ID = "image_id";
 
     private int id = -1;
     private String title;
     private String description;
+    private String imageId;
     private int status;
 
     public ToDooItem() {
@@ -54,5 +56,13 @@ public class ToDooItem implements Serializable {
     public void setStatus(int status) {
         if(status == 0 | status == 1)
             this.status = status;
+    }
+
+    public String getImageId() {
+        return imageId;
+    }
+
+    public void setImageId(String imageId) {
+        this.imageId = imageId;
     }
 }

@@ -21,6 +21,7 @@ public class SQLiteStrings {
             + ToDooItem.TITLE + " TEXT,"
             + ToDooItem.DESCRIPTION + " TEXT,"
             + ToDooItem.STATUS + " INTEGER DEFAULT 0,"
+            + ToDooItem.IMAGE_ID + " TEXT, "
             + ToDooItem.FK + " INTEGER,"
             + "FOREIGN KEY(" + ToDooItem.FK + ") REFERENCES " + ToDoo.TABLE + "(" + ToDoo.ID + ") ON DELETE CASCADE"
             + ")";

@@ -30,6 +30,7 @@ public class ToDooItemController {
             values.put(ToDooItem.FK, toDooId);
             values.put(ToDooItem.TITLE, toDooItem.getTitle());
             values.put(ToDooItem.DESCRIPTION, toDooItem.getDescription());
+            values.put(ToDooItem.IMAGE_ID, toDooItem.getImageId());
 
             resultado = database.insertWithOnConflict(ToDooItem.TABLE, null,
                     values, SQLiteDatabase.CONFLICT_REPLACE);
@@ -56,6 +57,7 @@ public class ToDooItemController {
                 values.put(ToDooItem.FK, toDooId);
                 values.put(ToDooItem.TITLE, toDooItem.getTitle());
                 values.put(ToDooItem.DESCRIPTION, toDooItem.getDescription());
+                values.put(ToDooItem.IMAGE_ID, toDooItem.getImageId());
 
                 database.insertWithOnConflict(ToDooItem.TABLE, null,
                         values, SQLiteDatabase.CONFLICT_REPLACE);
@@ -77,6 +79,7 @@ public class ToDooItemController {
                 toDooItem.setId(c.getInt(c.getColumnIndex(ToDooItem.ID)));
                 toDooItem.setTitle(c.getString(c.getColumnIndex(ToDooItem.TITLE)));
                 toDooItem.setDescription(c.getString(c.getColumnIndex(ToDooItem.DESCRIPTION)));
+                toDooItem.setDescription(c.getString(c.getColumnIndex(ToDooItem.IMAGE_ID)));
                 toDooItem.setStatus(c.getInt(c.getColumnIndex(ToDooItem.STATUS)));
                 toDooItems.add(toDooItem);
             } while (c.moveToNext());
@@ -106,6 +109,7 @@ public class ToDooItemController {
         try {
             values.put(ToDooItem.TITLE, toDooItem.getTitle());
             values.put(ToDooItem.DESCRIPTION, toDooItem.getDescription());
+            values.put(ToDooItem.IMAGE_ID, toDooItem.getImageId());
             values.put(ToDooItem.STATUS, toDooItem.getStatus());
 
             resultado = database.update(ToDooItem.TABLE,
