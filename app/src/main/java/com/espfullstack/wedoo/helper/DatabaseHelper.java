@@ -10,7 +10,7 @@ import com.espfullstack.wedoo.pojo.ToDooItem;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static DatabaseHelper dInstance = null;
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
     private static final String DATABASE_NAME = "WeDooDB";
     private static final String LOG = "DatabaseHelper";
 

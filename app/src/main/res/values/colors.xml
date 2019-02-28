@@ -9,6 +9,7 @@
     <color name="bg_register">#2e3237</color>
     <color name="bg_main">#ffffff</color>
     <color name="white">#ffffff</color>
+    <color name="white_pacity_bg">#A9FFFFFF</color>
     <color name="input_login">#222222</color>
     <color name="input_login_hint">#999999</color>
     <color name="input_register">#888888</color>
