@@ -148,14 +148,19 @@ public class MainActivity extends AppCompatActivity implements IToDooAction {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.btn_profile:
-                Intent i = new Intent(getApplicationContext(), ProfileActivity.class);
-                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(i);
+                abrirActivity(ProfileActivity.class);
                 break;
             case R.id.about:
+                abrirActivity(AboutActivity.class);
                 break;
         }
         return true;
+    }
+
+    private void abrirActivity(Class activityClass) {
+        Intent i = new Intent(getApplicationContext(), activityClass);
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(i);
     }
 
     @Override

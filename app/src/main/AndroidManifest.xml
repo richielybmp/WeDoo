@@ -13,11 +13,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".AboutActivity"></activity>
         <activity
             android:name=".FormToDooItemActivity"
-            android:theme="@style/AppTheme.NoActionBarForm">
-
-        </activity>
+            android:theme="@style/AppTheme.NoActionBarForm"></activity>
         <activity android:name=".ProfileActivity" />
         <activity
             android:name=".ToDooActivity"
