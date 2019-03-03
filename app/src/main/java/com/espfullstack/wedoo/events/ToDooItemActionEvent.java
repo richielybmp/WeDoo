@@ -6,7 +6,8 @@ public class ToDooItemActionEvent {
     public enum ToDooItemAction {
         SAVED,
         UPDATED,
-        DELETED
+        DELETED,
+        STATUS_UPDATED,
     }
     private ToDooItem toDooItem;
     private ToDooItemAction action;

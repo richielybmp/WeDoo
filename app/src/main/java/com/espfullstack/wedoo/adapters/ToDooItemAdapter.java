@@ -42,7 +42,7 @@ public class ToDooItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     public void update(ToDooItem toDooItem, int position) {
         toDooItems.set(position, toDooItem);
         notifyItemChanged(position);
-        EventBus.getDefault().post(new ToDooItemActionEvent(toDooItem, ToDooItemActionEvent.ToDooItemAction.UPDATED));
+        //EventBus.getDefault().post(new ToDooItemActionEvent(toDooItem, ToDooItemActionEvent.ToDooItemAction.UPDATED));
     }
 
     public ToDooItem getSelectedToDooItem(int position) {
@@ -93,6 +93,7 @@ public class ToDooItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             item.setStatus(0);
         }
         update(item, position);
+        EventBus.getDefault().post(new ToDooItemActionEvent(item, ToDooItemActionEvent.ToDooItemAction.STATUS_UPDATED));
     }
 
     class TodooItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{

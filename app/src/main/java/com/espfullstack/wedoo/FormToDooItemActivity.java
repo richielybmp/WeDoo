@@ -191,11 +191,31 @@ public class FormToDooItemActivity extends AppCompatActivity {
 
     private boolean save() {
         if (isUpdate) {
-            toDooItemAction = ToDooItemActionEvent.ToDooItemAction.UPDATED;
-            return toDooItemController.update(toDooItem);
+            return updateToDooItem();
         } else {
+            return saveToDooItem();
+        }
+    }
+
+    private Boolean updateToDooItem(){
+        if (toDooItemController.update(toDooItem)) {
+            Toast.makeText(getApplicationContext(), "Atualizado com sucesso", Toast.LENGTH_SHORT).show();
+            toDooItemAction = ToDooItemActionEvent.ToDooItemAction.UPDATED;
+            return true;
+        }else {
+            Toast.makeText(getApplicationContext(), "Erro ao atualizar ToDooItem", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+    }
+
+    private Boolean saveToDooItem(){
+        if (toDooItemController.add(toDooId, toDooItem)) {
+            Toast.makeText(getApplicationContext(), "Salvo com sucesso", Toast.LENGTH_SHORT).show();
             toDooItemAction = ToDooItemActionEvent.ToDooItemAction.SAVED;
-            return toDooItemController.add(toDooId, toDooItem);
+            return true;
+        }else {
+            Toast.makeText(getApplicationContext(), "Erro ao atualizar ToDooItem", Toast.LENGTH_SHORT).show();
+            return false;
         }
     }
 
