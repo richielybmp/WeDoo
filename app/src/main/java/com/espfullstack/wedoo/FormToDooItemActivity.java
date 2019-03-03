@@ -12,6 +12,7 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -20,6 +21,7 @@ import android.provider.MediaStore;
 import android.provider.SyncStateContract;
 import android.text.TextUtils;
 import android.util.Base64;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.webkit.MimeTypeMap;
@@ -29,6 +31,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.espfullstack.wedoo.controllers.ToDooItemController;
@@ -92,6 +95,9 @@ public class FormToDooItemActivity extends AppCompatActivity {
     @BindView(R.id.bg_loading)
     LinearLayout loadding_bg;
 
+    @BindView(R.id.loadding_image)
+    TextView loaddingImage;
+
     int toDooId;
     ToDooItem toDooItem;
     ToDooItemController toDooItemController;
@@ -114,10 +120,11 @@ public class FormToDooItemActivity extends AppCompatActivity {
 
         toDooItemController = new ToDooItemController(this);
         Bundle bundle = getIntent().getExtras();
-        toDooId =  bundle.getInt("todoo");
+        toDooId = bundle.getInt("todoo");
         toDooItem = (ToDooItem) bundle.getSerializable("todoo_item");
 
         initializeFirebase();
+
 
         if (toDooItem == null) {
             toDooItem = new ToDooItem();
@@ -130,9 +137,27 @@ public class FormToDooItemActivity extends AppCompatActivity {
         isUpdate = true;
         edtTitle.setText(toDooItem.getTitle());
         edtDescription.setText(toDooItem.getDescription());
+        if (toDooItem.getImageId() != null) {
+            loadding_bg.setVisibility(View.VISIBLE);
+            loaddingImage.setVisibility(View.VISIBLE);
+            StorageReference strRef = mStorageRef.child(toDooItem.getImageId());
+            final long ONE_MEGABYTE = 1024 * 2048;
+            strRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                @Override
+                public void onSuccess(byte[] bytes) {
+                    Bitmap bm = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                    DisplayMetrics dm = new DisplayMetrics();
+                    getWindowManager().getDefaultDisplay().getMetrics(dm);
+
+                    imageViewTodoItem.setImageBitmap(bm);
+                    loadding_bg.setVisibility(View.GONE);
+                    loaddingImage.setVisibility(View.GONE);
+                }
+            });
+        }
     }
 
-    public void initializeFirebase(){
+    public void initializeFirebase() {
         FirebaseApp.initializeApp(this);
         mStorageRef = FirebaseStorage.getInstance().getReference("images");
         mDatabaseRef = FirebaseDatabase.getInstance().getReference("images");
@@ -145,27 +170,27 @@ public class FormToDooItemActivity extends AppCompatActivity {
     }
 
     @OnClick(R.id.fab_createToDooItem)
-    public void cadastrar(){
-        if(inputsValidate()){
-            if(mUploadTask != null && mUploadTask.isInProgress()){
+    public void cadastrar() {
+        if (inputsValidate()) {
+            if (mUploadTask != null && mUploadTask.isInProgress()) {
                 Toast.makeText(this, "Upload in progress...", Toast.LENGTH_SHORT).show();
-            }else{
+            } else {
                 saveWithImage();
             }
-            if(imageUri == null && bitmapImage == null){
+            if (imageUri == null && bitmapImage == null) {
                 eventSave();
             }
         }
     }
 
-    private String getFileExtension(Uri uri){
+    private String getFileExtension(Uri uri) {
         ContentResolver contentResolver = getContentResolver();
         MimeTypeMap mime = MimeTypeMap.getSingleton();
         return mime.getExtensionFromMimeType(contentResolver.getType(uri));
     }
 
     private boolean save() {
-        if(isUpdate) {
+        if (isUpdate) {
             toDooItemAction = ToDooItemActionEvent.ToDooItemAction.UPDATED;
             return toDooItemController.update(toDooItem);
         } else {
@@ -174,23 +199,23 @@ public class FormToDooItemActivity extends AppCompatActivity {
         }
     }
 
-    private void eventSave(){
-        if(save()) {
+    private void eventSave() {
+        if (save()) {
             EventBus.getDefault().postSticky(new ToDooItemActionEvent(toDooItem, toDooItemAction));
             voltar();
         }
     }
 
-    private void saveWithImage(){
+    private void saveWithImage() {
 
-        if(imageUri != null || bitmapImage != null){
-            if(bitmapImage != null){
-                imageStoragedID = System.currentTimeMillis()+"_"+toDooId+"."+getFileExtension(imageUri);
+        if (imageUri != null || bitmapImage != null) {
+            if (bitmapImage != null) {
+                imageStoragedID = System.currentTimeMillis() + "_" + toDooId + ".JPEG";
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 bitmapImage.compress(Bitmap.CompressFormat.JPEG, 100, baos);
                 byte[] data = baos.toByteArray();
-                //StorageReference fileStorage = mStorageRef.child(imageStoragedID);
-                mUploadTask = mStorageRef.putBytes(data).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                StorageReference fileStorage = mStorageRef.child(imageStoragedID);
+                mUploadTask = fileStorage.putBytes(data).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                         Handler handler = new Handler();
@@ -203,7 +228,6 @@ public class FormToDooItemActivity extends AppCompatActivity {
                         }, 500);
                         Toast.makeText(FormToDooItemActivity.this, "Upload Sucessful", Toast.LENGTH_SHORT).show();
                         UploadImages uploadImages = new UploadImages(taskSnapshot.getStorage().getDownloadUrl().toString());
-
                         String uploadId = mDatabaseRef.push().getKey();
                         mDatabaseRef.child(uploadId).setValue(uploadImages);
 //                        Log.d("idUmage-->", imageStoragedID);
@@ -226,8 +250,9 @@ public class FormToDooItemActivity extends AppCompatActivity {
 
                             }
                         });
-            }else{
-                imageStoragedID = System.currentTimeMillis()+"_"+toDooId+"."+getFileExtension(imageUri);
+            }
+            if (imageUri != null) {
+                imageStoragedID = System.currentTimeMillis() + "_" + toDooId + "." + getFileExtension(imageUri);
                 StorageReference fileStorage = mStorageRef.child(imageStoragedID);
                 mUploadTask = fileStorage.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
@@ -271,15 +296,15 @@ public class FormToDooItemActivity extends AppCompatActivity {
     }
 
     @OnClick(R.id.btn_back_form_todo_item)
-    public void voltar(){
+    public void voltar() {
         finish();
     }
 
-    public Boolean inputsValidate(){
+    public Boolean inputsValidate() {
         String title = edtTitle.getText().toString().trim();
         String description = edtDescription.getText().toString().trim();
 
-        if(TextUtils.isEmpty(title)){
+        if (TextUtils.isEmpty(title)) {
             edtTitle.requestFocus();
             edtTitle.setError(getString(R.string.required));
             return false;
@@ -292,15 +317,15 @@ public class FormToDooItemActivity extends AppCompatActivity {
     }
 
     @OnClick(R.id.btn_choose_galery)
-    public void chooseImage(){
-        Intent intent =new Intent();
+    public void chooseImage() {
+        Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(intent, PICK_IMAGE_REQUEST);
     }
 
     @OnClick(R.id.btn_cam_form_todo_item)
-    public void capturePhoto(){
+    public void capturePhoto() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(intent, PICK_IMAGE_REQUEST);
     }
@@ -309,21 +334,21 @@ public class FormToDooItemActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         //super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(requestCode == PICK_IMAGE_REQUEST){
-            if(grantResults.length > 0){
-                if(grantResults[0] ==
-                        PackageManager.PERMISSION_GRANTED){
+        if (requestCode == PICK_IMAGE_REQUEST) {
+            if (grantResults.length > 0) {
+                if (grantResults[0] ==
+                        PackageManager.PERMISSION_GRANTED) {
                     //TODO ABRO A CAMERA
-                }else{
+                } else {
                     showError(R.string.error_permission_not_granted);
                 }
-            } else{
+            } else {
                 showError(R.string.permission_request_canceled);
             }
         }
     }
 
-    public void showError(int idStringDescription){
+    public void showError(int idStringDescription) {
 //        new MaterialDialog.Builder(this)
 //                .title(R.string.title_error)
 //                .content(idStringDescription)
@@ -333,11 +358,10 @@ public class FormToDooItemActivity extends AppCompatActivity {
     }
 
 
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK){
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK) {
             if (data != null && data.getExtras() != null) {
                 //Se existir nova imagem
                 //imageUri = data.getData();
@@ -346,10 +370,9 @@ public class FormToDooItemActivity extends AppCompatActivity {
                 bitmapImage = (Bitmap) data.getExtras().get("data");
                 imageViewTodoItem.setImageBitmap(bitmapImage);
                 bitmapImage = imageViewTodoItem.getDrawingCache();
-
             }
 
-            if(data != null && data.getData() != null){
+            if (data != null && data.getData() != null) {
                 imageUri = data.getData();
 
                 //StorageReference filePath = mStorageRef.child()

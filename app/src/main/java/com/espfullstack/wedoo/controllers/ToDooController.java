@@ -114,6 +114,7 @@ public class ToDooController {
                         toDooItem.setId(cItem.getInt(cItem.getColumnIndex(ToDooItem.ID)));
                         toDooItem.setTitle(cItem.getString(cItem.getColumnIndex(ToDooItem.TITLE)));
                         toDooItem.setDescription(cItem.getString(cItem.getColumnIndex(ToDooItem.DESCRIPTION)));
+                        toDooItem.setImageId(cItem.getString(cItem.getColumnIndex(ToDooItem.IMAGE_ID)));
                         toDooItem.setStatus(cItem.getInt(cItem.getColumnIndex(ToDooItem.STATUS)));
                         toDooItems.add(toDooItem);
                     } while (cItem.moveToNext());

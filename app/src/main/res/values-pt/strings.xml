@@ -50,6 +50,8 @@
     <string name="snack_bar_undo">Desfazer</string>
     <string name="todoo_deleted">ToDoo removido!</string>
     <string name="required">Requerido</string>
+    <string name="loadding_image">Carregando Imagem...</string>
+
 
     <plurals name="items">
         <item quantity="one">%d item</item>
