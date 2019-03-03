@@ -57,7 +57,7 @@
 
     <string name="error_permission_not_granted">Permission not granted</string>
     <string name="permission_request_canceled">Permission canceled</string>
-    <string name="loadding_image">Loadding image...</string>
+    <string name="loadding_image">Loading Image...</string>
 
     <plurals name="items">
         <item quantity="one">%d item</item>

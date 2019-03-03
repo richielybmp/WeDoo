@@ -23,6 +23,9 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
@@ -64,7 +67,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.UUID;
 
-public class FormToDooItemActivity extends AppCompatActivity {
+public class FormToDooItemActivity extends AppCompatActivity implements View.OnCreateContextMenuListener, MenuItem.OnMenuItemClickListener {
 
     private static final int PICK_IMAGE_REQUEST = 1;
 
@@ -73,6 +76,9 @@ public class FormToDooItemActivity extends AppCompatActivity {
 
     @BindView(R.id.fab_createToDooItem)
     FloatingActionButton btnCreateTodoItem;
+
+    @BindView(R.id.title_edit_ectivity)
+    TextView txtTitle;
 
     @BindView(R.id.edt_title)
     EditText edtTitle;
@@ -95,7 +101,7 @@ public class FormToDooItemActivity extends AppCompatActivity {
     @BindView(R.id.bg_loading)
     LinearLayout loadding_bg;
 
-    @BindView(R.id.loadding_image)
+    @BindView(R.id.loading_image)
     TextView loaddingImage;
 
     int toDooId;
@@ -111,6 +117,8 @@ public class FormToDooItemActivity extends AppCompatActivity {
     private StorageTask mUploadTask;
     private String imageStoragedID;
     private Bitmap bitmapImage;
+    private String imageCache;
+    private UploadImages uploadImages;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,12 +139,16 @@ public class FormToDooItemActivity extends AppCompatActivity {
         } else {
             init(toDooItem);
         }
+
+        imageViewTodoItem.setOnCreateContextMenuListener(this);
     }
 
     private void init(ToDooItem toDooItem) {
         isUpdate = true;
         edtTitle.setText(toDooItem.getTitle());
         edtDescription.setText(toDooItem.getDescription());
+        txtTitle.setText("Edit Task");
+        imageCache = toDooItem.getImageId();
         if (toDooItem.getImageId() != null) {
             loadding_bg.setVisibility(View.VISIBLE);
             loaddingImage.setVisibility(View.VISIBLE);
@@ -199,12 +211,20 @@ public class FormToDooItemActivity extends AppCompatActivity {
 
     private Boolean updateToDooItem(){
         if (toDooItemController.update(toDooItem)) {
+            deleteOldImage();
             Toast.makeText(getApplicationContext(), "Atualizado com sucesso", Toast.LENGTH_SHORT).show();
             toDooItemAction = ToDooItemActionEvent.ToDooItemAction.UPDATED;
             return true;
         }else {
             Toast.makeText(getApplicationContext(), "Erro ao atualizar ToDooItem", Toast.LENGTH_SHORT).show();
             return false;
+        }
+    }
+
+    private void deleteOldImage(){
+        if(imageCache!= null && !toDooItem.getImageId().equals(imageCache)){
+            StorageReference strRef = mStorageRef.child(imageCache);
+            strRef.delete();
         }
     }
 
@@ -228,90 +248,82 @@ public class FormToDooItemActivity extends AppCompatActivity {
 
     private void saveWithImage() {
 
-        if (imageUri != null || bitmapImage != null) {
-            if (bitmapImage != null) {
-                imageStoragedID = System.currentTimeMillis() + "_" + toDooId + ".JPEG";
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                bitmapImage.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-                byte[] data = baos.toByteArray();
-                StorageReference fileStorage = mStorageRef.child(imageStoragedID);
-                mUploadTask = fileStorage.putBytes(data).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        Handler handler = new Handler();
-                        handler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
+        if (bitmapImage != null) {
+            imageStoragedID = System.currentTimeMillis() + "_" + toDooId + ".JPEG";
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bitmapImage.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            byte[] data = baos.toByteArray();
+            StorageReference fileStorage = mStorageRef.child(imageStoragedID);
+            mUploadTask = fileStorage.putBytes(data).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
 //                                    progressBar.setProgress(0);
-                                loadding_bg.setVisibility(View.GONE);
-                            }
-                        }, 500);
-                        Toast.makeText(FormToDooItemActivity.this, "Upload Sucessful", Toast.LENGTH_SHORT).show();
-                        UploadImages uploadImages = new UploadImages(taskSnapshot.getStorage().getDownloadUrl().toString());
-                        String uploadId = mDatabaseRef.push().getKey();
-                        mDatabaseRef.child(uploadId).setValue(uploadImages);
-//                        Log.d("idUmage-->", imageStoragedID);
-                        Log.d("uploadId-->", uploadId);
-                        toDooItem.setImageId(imageStoragedID);
-                        eventSave();
-                    }
-                })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Toast.makeText(FormToDooItemActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
-                        })
-                        .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                            @Override
-                            public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                            loadding_bg.setVisibility(View.GONE);
+                        }
+                    }, 500);
+                    Toast.makeText(FormToDooItemActivity.this, "Upload Sucessful", Toast.LENGTH_SHORT).show();
+                    uploadImages = new UploadImages(taskSnapshot.getStorage().getDownloadUrl().toString());
+                    String uploadId = mDatabaseRef.push().getKey();
+                    mDatabaseRef.child(uploadId).setValue(uploadImages);
+                    toDooItem.setImageId(imageStoragedID);
+                    eventSave();
+                }
+            })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(FormToDooItemActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
 
-                                loadding_bg.setVisibility(View.VISIBLE);
+                            loadding_bg.setVisibility(View.VISIBLE);
 
-                            }
-                        });
-            }
-            if (imageUri != null) {
-                imageStoragedID = System.currentTimeMillis() + "_" + toDooId + "." + getFileExtension(imageUri);
-                StorageReference fileStorage = mStorageRef.child(imageStoragedID);
-                mUploadTask = fileStorage.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        Handler handler = new Handler();
-                        handler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-//                                    progressBar.setProgress(0);
-                                loadding_bg.setVisibility(View.GONE);
-                            }
-                        }, 500);
-                        Toast.makeText(FormToDooItemActivity.this, "Upload Sucessful", Toast.LENGTH_SHORT).show();
-                        UploadImages uploadImages = new UploadImages(taskSnapshot.getStorage().getDownloadUrl().toString());
+                        }
+                    });
+        }
+        if (imageUri != null) {
+            imageStoragedID = System.currentTimeMillis() + "_" + toDooId + "." + getFileExtension(imageUri);
+            StorageReference fileStorage = mStorageRef.child(imageStoragedID);
+            mUploadTask = fileStorage.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            loadding_bg.setVisibility(View.GONE);
+                        }
+                    }, 500);
+                    Toast.makeText(FormToDooItemActivity.this, "Upload Sucessful", Toast.LENGTH_SHORT).show();
+                    uploadImages = new UploadImages(taskSnapshot.getStorage().getDownloadUrl().toString());
 
-                        String uploadId = mDatabaseRef.push().getKey();
-                        mDatabaseRef.child(uploadId).setValue(uploadImages);
-                        Log.d("idUmage-->", imageStoragedID);
-                        Log.d("uploadId-->", uploadId);
-                        toDooItem.setImageId(imageStoragedID);
-                        eventSave();
-                    }
-                })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Toast.makeText(FormToDooItemActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
-                        })
-                        .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                            @Override
-                            public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                    String uploadId = mDatabaseRef.push().getKey();
+                    mDatabaseRef.child(uploadId).setValue(uploadImages);
+                    toDooItem.setImageId(imageStoragedID);
+                    eventSave();
+                }
+            })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(FormToDooItemActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
 
-                                loadding_bg.setVisibility(View.VISIBLE);
+                            loadding_bg.setVisibility(View.VISIBLE);
 
-                            }
-                        });
-            }
-
+                        }
+                    });
         }
     }
 
@@ -403,4 +415,24 @@ public class FormToDooItemActivity extends AppCompatActivity {
         }
 
     }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        menu.setHeaderTitle("Actions");
+        MenuItem delete = menu.add(Menu.NONE, 1, 1, "Delete Image");
+        delete.setOnMenuItemClickListener(this);
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        switch (item.getItemId()){
+            case 1:
+                toDooItem.setImageId("");
+                imageViewTodoItem.setImageResource(R.drawable.ic_image);
+            break;
+        }
+        return true;
+    }
+
 }
