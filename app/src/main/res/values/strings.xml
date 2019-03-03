@@ -55,6 +55,9 @@
     <string name="snack_bar_undo">Undo</string>
     <string name="todoo_deleted">ToDoo deleted!</string>
 
+    <string name="error_permission_not_granted">Permission not granted</string>
+    <string name="permission_request_canceled">Permission canceled</string>
+
     <plurals name="items">
         <item quantity="one">%d item</item>
         <item quantity="other">%d items </item>
