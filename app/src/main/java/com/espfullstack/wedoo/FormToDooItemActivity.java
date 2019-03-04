@@ -73,7 +73,8 @@ import java.util.UUID;
 public class FormToDooItemActivity extends AppCompatActivity implements View.OnCreateContextMenuListener, MenuItem.OnMenuItemClickListener {
 
     private static final int PICK_IMAGE_REQUEST = 1;
-    private static final int PERMISSION_CAMERA = 1;
+    private static final int PERMISSION_CAMERA = 2;
+    private static final int PERMISSION_READ_STORAGE = 3;
 
     @BindView(R.id.btn_back_form_todo_item)
     ImageButton btnBack;
@@ -358,48 +359,51 @@ public class FormToDooItemActivity extends AppCompatActivity implements View.OnC
 
     @OnClick(R.id.btn_choose_galery)
     public void chooseImage() {
-//        if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-//
-//        }
 
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(intent, PICK_IMAGE_REQUEST);
+        // Here, thisActivity is the current activity
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+
+//                Toast.makeText(this, "Write External Storage permission allows us to do store images. Please allow this permission in App Settings.", Toast.LENGTH_LONG).show();
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_READ_STORAGE);
+
+
+            } else {
+
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_READ_STORAGE);
+
+            }
+        }else{
+            Intent intent = new Intent();
+            intent.setType("image/*");
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+            startActivityForResult(intent, PICK_IMAGE_REQUEST);
+        }
+
     }
 
     @OnClick(R.id.btn_cam_form_todo_item)
     public void capturePhoto() {
 
+        // Here, thisActivity is the current activity
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
 
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, PERMISSION_CAMERA);
-        }
+//                Toast.makeText(this, "Camera need your permission to take pictures with your phone. Please allow this permission in App Settings.", Toast.LENGTH_LONG).show();
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, PERMISSION_CAMERA);
 
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(intent, PICK_IMAGE_REQUEST);
-    }
-
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        //super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == PICK_IMAGE_REQUEST) {
-            if (grantResults.length > 0) {
-                if (grantResults[0] ==
-                        PackageManager.PERMISSION_GRANTED) {
-                    //TODO ABRO A CAMERA
-                } else {
-
-                }
             } else {
 
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, PERMISSION_CAMERA);
+
             }
+        }else{
+            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            startActivityForResult(intent, PICK_IMAGE_REQUEST);
         }
+
+
     }
-
-
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -444,6 +448,38 @@ public class FormToDooItemActivity extends AppCompatActivity implements View.OnC
             break;
         }
         return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSION_CAMERA: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    startActivityForResult(intent, PICK_IMAGE_REQUEST);
+
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    Toast.makeText(this, "We need your permission to execute this function", Toast.LENGTH_LONG).show();
+                }
+                break;
+            }
+            case PERMISSION_READ_STORAGE: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Intent intent = new Intent();
+                    intent.setType("image/*");
+                    intent.setAction(Intent.ACTION_GET_CONTENT);
+                    startActivityForResult(intent, PICK_IMAGE_REQUEST);
+                }else{
+                    Toast.makeText(this, "We need your permission to execute this function", Toast.LENGTH_LONG).show();
+                }
+                break;
+            }
+
+        }
     }
 
 }

@@ -26,6 +26,10 @@ import com.espfullstack.wedoo.helper.RecyclerViewDataObserver;
 import com.espfullstack.wedoo.helper.ToDooItemSwipeCallback;
 import com.espfullstack.wedoo.pojo.ToDoo;
 import com.espfullstack.wedoo.pojo.ToDooItem;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -45,6 +49,7 @@ public class ToDooActivity extends AppCompatActivity {
     private ToDooItemController toDooItemController;
     private ToDooItemAdapter toDooItemAdapter;
     RecyclerViewDataObserver dataObserver;
+    private StorageReference mStorageRef;
 
     private int clickedPosition = -1;
     private boolean hasChanged = false;
@@ -75,6 +80,14 @@ public class ToDooActivity extends AppCompatActivity {
 
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ToDooItemSwipeCallback(toDooItemAdapter, this));
         itemTouchHelper.attachToRecyclerView(rvToDooItem);
+
+        initializeFirebase();
+
+    }
+
+    public void initializeFirebase() {
+        FirebaseApp.initializeApp(this);
+        mStorageRef = FirebaseStorage.getInstance().getReference("images");
     }
 
     @Override
@@ -152,6 +165,10 @@ public class ToDooActivity extends AppCompatActivity {
                 break;
             case DELETED:
                 toDooItemAdapter.delete(clickedPosition);
+                if(toDooItem.getImageId() != null){
+                    StorageReference strRef = mStorageRef.child(toDooItem.getImageId());
+                    strRef.delete();
+                }
                 break;
         }
     }
