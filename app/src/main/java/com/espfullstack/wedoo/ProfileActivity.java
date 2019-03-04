@@ -64,6 +64,13 @@ public class ProfileActivity extends AppCompatActivity {
         }
     }
 
+    @OnClick(R.id.btn_logout)
+    public void logOut(){
+        auth.signOut();
+        redirectToLogin();
+        Toast.makeText(this, "Log out done!", Toast.LENGTH_SHORT).show();
+    }
+
     private void redirectToLogin() {
         SessionMannager.clearToken(getApplicationContext());
 
@@ -72,13 +79,6 @@ public class ProfileActivity extends AppCompatActivity {
         signInIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(signInIntent);
         finish();
-    }
-
-    @OnClick(R.id.btn_logout)
-    public void logOut(){
-        auth.signOut();
-        redirectToLogin();
-        Toast.makeText(this, "Log out done!", Toast.LENGTH_SHORT).show();
     }
 
 }

@@ -106,6 +106,18 @@ public class MainActivity extends AppCompatActivity implements IToDooAction {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.tab_menu, menu);
@@ -157,24 +169,6 @@ public class MainActivity extends AppCompatActivity implements IToDooAction {
         return true;
     }
 
-    private void abrirActivity(Class activityClass) {
-        Intent i = new Intent(getApplicationContext(), activityClass);
-        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(i);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        EventBus.getDefault().register(this);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        EventBus.getDefault().unregister(this);
-    }
-
     @Subscribe
     public void onToDooItemClickedEvent(ToDooClickedEvent itemClickedEvent) {
         clickedPosition = itemClickedEvent.getPosition();
@@ -193,14 +187,6 @@ public class MainActivity extends AppCompatActivity implements IToDooAction {
         formToDoDialog.show(getSupportFragmentManager(), "my_dialog");
     }
 
-    private void startActivityToDoo(ToDoo toDoo) {
-        Intent intent = new Intent(this, ToDooActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putSerializable("todoo", toDoo);
-        intent.putExtras(bundle);
-        startActivity(intent);
-    }
-
     @Override
     public void onToDooInserted(ToDoo toDoo) {
         toDooAdapter.add(toDoo);
@@ -214,6 +200,20 @@ public class MainActivity extends AppCompatActivity implements IToDooAction {
     @Override
     public void onToDooDeleted(ToDoo toDoo) {
         toDooController.delete(toDoo.getId());
+    }
+
+    private void startActivityToDoo(ToDoo toDoo) {
+        Intent intent = new Intent(this, ToDooActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("todoo", toDoo);
+        intent.putExtras(bundle);
+        startActivity(intent);
+    }
+
+    private void abrirActivity(Class activityClass) {
+        Intent i = new Intent(getApplicationContext(), activityClass);
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(i);
     }
 }
 

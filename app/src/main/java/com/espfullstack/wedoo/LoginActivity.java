@@ -181,6 +181,29 @@ public class LoginActivity extends AppCompatActivity {
         updateUI(currentUser);
     }
 
+    @OnClick(R.id.btn_signup)
+    public void showSignUpActivity(){
+        startActivity(new Intent(LoginActivity.this, SignupActivity.class));
+    }
+
+    @OnClick(R.id.google_signin)
+    public void signIn(){
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+
+    @OnClick(R.id.btn_reset_password)
+    public void showResetPassowrdActivity(){
+        startActivity(new Intent(LoginActivity.this, ResetPasswordActivity.class));
+    }
+
+    @OnClick(R.id.ivAndroido)
+    public void onSuperSecreto(){
+        Toast.makeText(this, "Voce nao deveria saber disso!", Toast.LENGTH_SHORT).show();
+        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+        finish();
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -230,29 +253,6 @@ public class LoginActivity extends AppCompatActivity {
                         // [END_EXCLUDE]
                     }
                 });
-    }
-
-    @OnClick(R.id.btn_signup)
-    public void showSignUpActivity(){
-        startActivity(new Intent(LoginActivity.this, SignupActivity.class));
-    }
-
-    @OnClick(R.id.google_signin)
-    public void signIn(){
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
-    }
-
-    @OnClick(R.id.btn_reset_password)
-    public void showResetPassowrdActivity(){
-        startActivity(new Intent(LoginActivity.this, ResetPasswordActivity.class));
-    }
-
-    @OnClick(R.id.ivAndroido)
-    public void onSuperSecreto(){
-        Toast.makeText(this, "Voce nao deveria saber disso!", Toast.LENGTH_SHORT).show();
-        startActivity(new Intent(LoginActivity.this, MainActivity.class));
-        finish();
     }
 
     private void updateUI(FirebaseUser currentUser) {

@@ -148,6 +148,32 @@ public class FormToDooItemActivity extends AppCompatActivity implements View.OnC
         imageViewTodoItem.setOnCreateContextMenuListener(this);
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK) {
+            if (data != null && data.getExtras() != null) {
+                //Se existir nova imagem
+                //imageUri = data.getData();
+                imageViewTodoItem.setDrawingCacheEnabled(true);
+                imageViewTodoItem.buildDrawingCache();
+                bitmapImage = (Bitmap) data.getExtras().get("data");
+                imageViewTodoItem.setImageBitmap(bitmapImage);
+                bitmapImage = imageViewTodoItem.getDrawingCache();
+            }
+
+            if (data != null && data.getData() != null) {
+                imageUri = data.getData();
+
+                //StorageReference filePath = mStorageRef.child()
+
+                Picasso.get().load(imageUri).into(imageViewTodoItem);
+            }
+
+        }
+
+    }
+
     private void init(ToDooItem toDooItem) {
         imageCache = null;
         isUpdate = true;
@@ -175,16 +201,67 @@ public class FormToDooItemActivity extends AppCompatActivity implements View.OnC
         }
     }
 
-    public void initializeFirebase() {
-        FirebaseApp.initializeApp(this);
-        mStorageRef = FirebaseStorage.getInstance().getReference("images");
-        mDatabaseRef = FirebaseDatabase.getInstance().getReference("images");
-    }
-
     @Override
     public void finish() {
         super.finish();
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        menu.setHeaderTitle("Actions");
+        MenuItem delete = menu.add(Menu.NONE, 1, 1, "Delete Image");
+        delete.setOnMenuItemClickListener(this);
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        switch (item.getItemId()){
+            case 1:
+                toDooItem.setImageId(null);
+                imageViewTodoItem.setImageResource(R.drawable.ic_image);
+                break;
+        }
+        return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSION_CAMERA: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    startActivityForResult(intent, PICK_IMAGE_REQUEST);
+
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    Toast.makeText(this, "We need your permission to execute this function", Toast.LENGTH_LONG).show();
+                }
+                break;
+            }
+            case PERMISSION_READ_STORAGE: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Intent intent = new Intent();
+                    intent.setType("image/*");
+                    intent.setAction(Intent.ACTION_GET_CONTENT);
+                    startActivityForResult(intent, PICK_IMAGE_REQUEST);
+                }else{
+                    Toast.makeText(this, "We need your permission to execute this function", Toast.LENGTH_LONG).show();
+                }
+                break;
+            }
+
+        }
+    }
+
+    public void initializeFirebase() {
+        FirebaseApp.initializeApp(this);
+        mStorageRef = FirebaseStorage.getInstance().getReference("images");
+        mDatabaseRef = FirebaseDatabase.getInstance().getReference("images");
     }
 
     @OnClick(R.id.fab_createToDooItem)
@@ -199,6 +276,75 @@ public class FormToDooItemActivity extends AppCompatActivity implements View.OnC
                 eventSave();
             }
         }
+    }
+
+    @OnClick(R.id.btn_back_form_todo_item)
+    public void voltar() {
+        finish();
+    }
+
+    public Boolean inputsValidate() {
+        String title = edtTitle.getText().toString().trim();
+        String description = edtDescription.getText().toString().trim();
+
+        if (TextUtils.isEmpty(title)) {
+            edtTitle.requestFocus();
+            edtTitle.setError(getString(R.string.required));
+            return false;
+        }
+
+        toDooItem.setTitle(title);
+        toDooItem.setDescription(description);
+
+        return true;
+    }
+
+    @OnClick(R.id.btn_choose_galery)
+    public void chooseImage() {
+
+        // Here, thisActivity is the current activity
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+
+//                Toast.makeText(this, "Write External Storage permission allows us to do store images. Please allow this permission in App Settings.", Toast.LENGTH_LONG).show();
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_READ_STORAGE);
+
+
+            } else {
+
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_READ_STORAGE);
+
+            }
+        }else{
+            Intent intent = new Intent();
+            intent.setType("image/*");
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+            startActivityForResult(intent, PICK_IMAGE_REQUEST);
+        }
+
+    }
+
+    @OnClick(R.id.btn_cam_form_todo_item)
+    public void capturePhoto() {
+
+        // Here, thisActivity is the current activity
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
+
+//                Toast.makeText(this, "Camera need your permission to take pictures with your phone. Please allow this permission in App Settings.", Toast.LENGTH_LONG).show();
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, PERMISSION_CAMERA);
+
+            } else {
+
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, PERMISSION_CAMERA);
+
+            }
+        }else{
+            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            startActivityForResult(intent, PICK_IMAGE_REQUEST);
+        }
+
+
     }
 
     private String getFileExtension(Uri uri) {
@@ -332,152 +478,6 @@ public class FormToDooItemActivity extends AppCompatActivity implements View.OnC
 
                         }
                     });
-        }
-    }
-
-    @OnClick(R.id.btn_back_form_todo_item)
-    public void voltar() {
-        finish();
-    }
-
-    public Boolean inputsValidate() {
-        String title = edtTitle.getText().toString().trim();
-        String description = edtDescription.getText().toString().trim();
-
-        if (TextUtils.isEmpty(title)) {
-            edtTitle.requestFocus();
-            edtTitle.setError(getString(R.string.required));
-            return false;
-        }
-
-        toDooItem.setTitle(title);
-        toDooItem.setDescription(description);
-
-        return true;
-    }
-
-    @OnClick(R.id.btn_choose_galery)
-    public void chooseImage() {
-
-        // Here, thisActivity is the current activity
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-
-//                Toast.makeText(this, "Write External Storage permission allows us to do store images. Please allow this permission in App Settings.", Toast.LENGTH_LONG).show();
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_READ_STORAGE);
-
-
-            } else {
-
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_READ_STORAGE);
-
-            }
-        }else{
-            Intent intent = new Intent();
-            intent.setType("image/*");
-            intent.setAction(Intent.ACTION_GET_CONTENT);
-            startActivityForResult(intent, PICK_IMAGE_REQUEST);
-        }
-
-    }
-
-    @OnClick(R.id.btn_cam_form_todo_item)
-    public void capturePhoto() {
-
-        // Here, thisActivity is the current activity
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
-
-//                Toast.makeText(this, "Camera need your permission to take pictures with your phone. Please allow this permission in App Settings.", Toast.LENGTH_LONG).show();
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, PERMISSION_CAMERA);
-
-            } else {
-
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, PERMISSION_CAMERA);
-
-            }
-        }else{
-            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            startActivityForResult(intent, PICK_IMAGE_REQUEST);
-        }
-
-
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK) {
-            if (data != null && data.getExtras() != null) {
-                //Se existir nova imagem
-                //imageUri = data.getData();
-                imageViewTodoItem.setDrawingCacheEnabled(true);
-                imageViewTodoItem.buildDrawingCache();
-                bitmapImage = (Bitmap) data.getExtras().get("data");
-                imageViewTodoItem.setImageBitmap(bitmapImage);
-                bitmapImage = imageViewTodoItem.getDrawingCache();
-            }
-
-            if (data != null && data.getData() != null) {
-                imageUri = data.getData();
-
-                //StorageReference filePath = mStorageRef.child()
-
-                Picasso.get().load(imageUri).into(imageViewTodoItem);
-            }
-
-        }
-
-    }
-
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        menu.setHeaderTitle("Actions");
-        MenuItem delete = menu.add(Menu.NONE, 1, 1, "Delete Image");
-        delete.setOnMenuItemClickListener(this);
-    }
-
-    @Override
-    public boolean onMenuItemClick(MenuItem item) {
-        switch (item.getItemId()){
-            case 1:
-                toDooItem.setImageId(null);
-                imageViewTodoItem.setImageResource(R.drawable.ic_image);
-            break;
-        }
-        return true;
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case PERMISSION_CAMERA: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    startActivityForResult(intent, PICK_IMAGE_REQUEST);
-
-                } else {
-
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
-                    Toast.makeText(this, "We need your permission to execute this function", Toast.LENGTH_LONG).show();
-                }
-                break;
-            }
-            case PERMISSION_READ_STORAGE: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Intent intent = new Intent();
-                    intent.setType("image/*");
-                    intent.setAction(Intent.ACTION_GET_CONTENT);
-                    startActivityForResult(intent, PICK_IMAGE_REQUEST);
-                }else{
-                    Toast.makeText(this, "We need your permission to execute this function", Toast.LENGTH_LONG).show();
-                }
-                break;
-            }
-
         }
     }
 

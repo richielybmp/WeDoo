@@ -85,6 +85,26 @@ public class ToDooActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(hasChanged) {
+            EventBus.getDefault().postSticky(new ToDooHasChangedEvent(toDoo));
+        }
+        super.onBackPressed();
+    }
+
     public void initializeFirebase() {
         FirebaseApp.initializeApp(this);
         mStorageRef = FirebaseStorage.getInstance().getReference("images");
@@ -119,26 +139,6 @@ public class ToDooActivity extends AppCompatActivity {
         i.putExtras(bundle);
         startActivity(i);
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-    }
-
-    @Override
-    public void onBackPressed() {
-        if(hasChanged) {
-            EventBus.getDefault().postSticky(new ToDooHasChangedEvent(toDoo));
-        }
-        super.onBackPressed();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        EventBus.getDefault().unregister(this);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        EventBus.getDefault().register(this);
     }
 
     @Subscribe
