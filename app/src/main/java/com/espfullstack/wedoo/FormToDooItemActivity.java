@@ -233,7 +233,6 @@ public class FormToDooItemActivity extends AppCompatActivity implements View.OnC
             StorageReference strRef = mStorageRef.child(imageCache);
             strRef.delete();
 
-
         }
     }
 

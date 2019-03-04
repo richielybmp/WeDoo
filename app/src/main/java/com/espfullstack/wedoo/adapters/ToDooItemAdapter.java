@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -104,6 +105,8 @@ public class ToDooItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         TextView txtDescription;
         @BindView(R.id.rlToDooItemLayoutBackground)
         View viewBackground;
+        @BindView(R.id.ic_img_todoitem)
+        ImageView icImage;
 
         TodooItemViewHolder(@NonNull View itemView){
             super(itemView);
@@ -122,6 +125,12 @@ public class ToDooItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             txtTitle.setText(toDooItem.getTitle());
             txtDescription.setText(toDooItem.getDescription());
             viewBackground.setBackgroundColor(toDooItem.getStatus() == 0 ? Color.RED : Color.GREEN);
+            if(toDooItem.getImageId() != null){
+                icImage.setVisibility(View.VISIBLE);
+            }else{
+                icImage.setVisibility(View.GONE);
+
+            }
             // TODO: ADICIONAR A DATA EM QUE O ITEM FOI CONCLUIDO.
         }
     }
