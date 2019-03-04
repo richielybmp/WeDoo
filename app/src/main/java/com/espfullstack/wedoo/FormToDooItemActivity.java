@@ -3,11 +3,14 @@ package com.espfullstack.wedoo;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -70,6 +73,7 @@ import java.util.UUID;
 public class FormToDooItemActivity extends AppCompatActivity implements View.OnCreateContextMenuListener, MenuItem.OnMenuItemClickListener {
 
     private static final int PICK_IMAGE_REQUEST = 1;
+    private static final int PERMISSION_CAMERA = 1;
 
     @BindView(R.id.btn_back_form_todo_item)
     ImageButton btnBack;
@@ -144,12 +148,13 @@ public class FormToDooItemActivity extends AppCompatActivity implements View.OnC
     }
 
     private void init(ToDooItem toDooItem) {
+        imageCache = null;
         isUpdate = true;
         edtTitle.setText(toDooItem.getTitle());
         edtDescription.setText(toDooItem.getDescription());
         txtTitle.setText("Edit Task");
         imageCache = toDooItem.getImageId();
-        if (toDooItem.getImageId() != null) {
+        if (toDooItem.getImageId() != null ) {
             loadding_bg.setVisibility(View.VISIBLE);
             loaddingImage.setVisibility(View.VISIBLE);
             StorageReference strRef = mStorageRef.child(toDooItem.getImageId());
@@ -222,9 +227,12 @@ public class FormToDooItemActivity extends AppCompatActivity implements View.OnC
     }
 
     private void deleteOldImage(){
-        if(imageCache!= null && !toDooItem.getImageId().equals(imageCache)){
+        if(imageCache != null){
+
             StorageReference strRef = mStorageRef.child(imageCache);
             strRef.delete();
+
+
         }
     }
 
@@ -350,6 +358,10 @@ public class FormToDooItemActivity extends AppCompatActivity implements View.OnC
 
     @OnClick(R.id.btn_choose_galery)
     public void chooseImage() {
+//        if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+//
+//        }
+
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
@@ -358,6 +370,12 @@ public class FormToDooItemActivity extends AppCompatActivity implements View.OnC
 
     @OnClick(R.id.btn_cam_form_todo_item)
     public void capturePhoto() {
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, PERMISSION_CAMERA);
+        }
+
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(intent, PICK_IMAGE_REQUEST);
     }
@@ -372,22 +390,15 @@ public class FormToDooItemActivity extends AppCompatActivity implements View.OnC
                         PackageManager.PERMISSION_GRANTED) {
                     //TODO ABRO A CAMERA
                 } else {
-                    showError(R.string.error_permission_not_granted);
+
                 }
             } else {
-                showError(R.string.permission_request_canceled);
+
             }
         }
     }
 
-    public void showError(int idStringDescription) {
-//        new MaterialDialog.Builder(this)
-//                .title(R.string.title_error)
-//                .content(idStringDescription)
-//                .positiveText(R.string.label_ok)
-//                .show();
-        Toast.makeText(this, "Error man.", Toast.LENGTH_SHORT).show();
-    }
+
 
 
     @Override
@@ -428,7 +439,7 @@ public class FormToDooItemActivity extends AppCompatActivity implements View.OnC
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()){
             case 1:
-                toDooItem.setImageId("");
+                toDooItem.setImageId(null);
                 imageViewTodoItem.setImageResource(R.drawable.ic_image);
             break;
         }

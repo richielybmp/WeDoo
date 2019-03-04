@@ -18,6 +18,9 @@ public class ToDooItem implements Serializable {
     private int status;
 
     public ToDooItem() {
+        this.title = null;
+        this.description = null;
+        this.imageId = null;
     }
 
     public ToDooItem(String title, String description) {
